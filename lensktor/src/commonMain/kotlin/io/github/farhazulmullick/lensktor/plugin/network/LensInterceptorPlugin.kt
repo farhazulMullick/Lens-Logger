@@ -1,9 +1,9 @@
 package io.github.farhazulmullick.lensktor.plugin.network
 
-import io.github.farhazulmullick.lensktor.ui.LensKtorStateManager.logRequest
-import io.github.farhazulmullick.lensktor.ui.LensKtorStateManager.logRequestException
-import io.github.farhazulmullick.lensktor.ui.LensKtorStateManager.logResponse
-import io.github.farhazulmullick.lensktor.ui.LensKtorStateManager.logResponseException
+import io.github.farhazulmullick.lensktor.plugin.network.LensKtorStateManager.logRequest
+import io.github.farhazulmullick.lensktor.plugin.network.LensKtorStateManager.logRequestException
+import io.github.farhazulmullick.lensktor.plugin.network.LensKtorStateManager.logResponse
+import io.github.farhazulmullick.lensktor.plugin.network.LensKtorStateManager.logResponseException
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.HttpClientCall
@@ -34,6 +34,7 @@ import io.ktor.utils.io.readAvailable
 
 internal val LensCallLoggingKey = AttributeKey<Int>("LensCallLoggingKey")
 internal val DisableLogging = AttributeKey<Unit>("LensDisableLogging")
+internal val CurrentTimeKey = AttributeKey<Long>("CurrentTimeKey")
 
 class LensConfig {
     internal var filters = mutableListOf<(HttpRequestBuilder) -> Boolean>()

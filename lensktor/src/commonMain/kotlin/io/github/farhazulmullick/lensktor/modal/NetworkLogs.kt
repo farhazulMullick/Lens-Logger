@@ -8,7 +8,12 @@ data class NetworkLogs(
     val logLevel: LogLevel? = null,
     val request: Resource<HttpRequestBuilder>? = Resource.Loading(),
     val response: Resource<HttpResponse>? = Resource.Loading(),
+    val responseTime: Long? = null
 ) {
-    val requestData = if (request is Resource.Success) request.data else null
+    val requestData = when (request) {
+        is Resource.Success -> request.data
+        is Resource.Failed -> request.data
+        else -> null
+    }
     val responseData = if (response is Resource.Success) response.data else null
 }

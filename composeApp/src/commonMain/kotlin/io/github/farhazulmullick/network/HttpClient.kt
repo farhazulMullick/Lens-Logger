@@ -2,6 +2,7 @@ package io.github.farhazulmullick.network
 
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
+import io.github.farhazulmullick.lensktor.plugin.network.LensHttpLogger
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.DefaultRequest
@@ -9,6 +10,8 @@ import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpRequestRetryConfig
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.LoggingConfig
 import io.ktor.client.request.headers
@@ -35,10 +38,10 @@ fun HttpKtorClient(
     jsonConfigs: Json = JSON,
     timeoutDuration: Long = TIMEOUT_DURATION,
     enableHttpLogging: Boolean = true,
-    loginConfigs: LoggingConfig.() -> Unit = {  },
+    loginConfigs: LoggingConfig.() -> Unit = { DefaultLogging() },
     httpRetryConfigs: HttpRequestRetryConfig.() -> Unit = { DefaultHttpRetryConfigs() },
 ): HttpClient {
-    val httpClient = HttpClient() {
+    val httpClient = HttpClient(getHttpClientEngine()) {
 
         // converts response into dto objects
         install(ContentNegotiation) {
@@ -71,7 +74,7 @@ fun HttpKtorClient(
 
         // Log HTTP request and response
         if (enableHttpLogging)
-            install(Logging) {
+            LensHttpLogger {
                 loginConfigs()
             }.also { Napier.base(DebugAntilog()) }
     }
@@ -83,4 +86,14 @@ internal fun HttpRequestRetryConfig.DefaultHttpRetryConfigs() {
     retryOnException(retryOnTimeout = true, maxRetries = 5)
     retryOnServerErrors(3)
     exponentialDelay()
+}
+
+
+fun LoggingConfig.DefaultLogging() {
+    level = LogLevel.ALL
+    logger = object : Logger {
+        override fun log(message: String) {
+            Napier.d(message = message)
+        }
+    }
 }

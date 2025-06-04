@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import io.github.aakira.napier.Napier
 import io.github.farhazulmullick.navigation.LensRoute
 import io.github.farhazulmullick.network.HttpKtorClient
 import io.ktor.client.call.body
@@ -25,6 +27,8 @@ import io.ktor.http.Url
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,10 +50,10 @@ fun LensApp(
                     }
                 }
             )
-            for (i in 0..2) {
-                launch {
-                    client.get(urlString = "https://jsonplaceholder.typicode.com/v1/post/$i")
-                }
+            launch {
+                val a = client.get(urlString = "https://jsonplaceholder.typicode.com/comments?postId=1")
+                val body = a.body<String>()
+                Napier.d(tag = "LensApp") { "$body" }
             }
         }
     }
@@ -73,11 +77,30 @@ internal fun LensContent(){
                 navController = navController
             ) {
                 composable<LensRoute.NetLogScreen> {
-                    NetLoggingScreen()
+                    NetLoggingScreen() {
+                        // navigate to details screen.
+                        navController.navigate(LensRoute.NetLogInfoScreen(index = it))
+                    }
                 }
-
-                composable<LensRoute.NetLogInfoScreen> {}
+                composable<LensRoute.NetLogInfoScreen> {entry ->
+                    val data: LensRoute.NetLogInfoScreen = entry.toRoute<LensRoute.NetLogInfoScreen>()
+                    NetLoggingInfoScreen(index = data.index)
+                }
             }
         }
     }
 }
+
+@Serializable
+data class Comment(
+    @SerialName("postId")
+    val postId: Int?,
+    @SerialName("id")
+    val id: Int?,
+    @SerialName("name")
+    val name: String?,
+    @SerialName("email")
+    val email: String?,
+    @SerialName("body")
+    val body: String?
+)

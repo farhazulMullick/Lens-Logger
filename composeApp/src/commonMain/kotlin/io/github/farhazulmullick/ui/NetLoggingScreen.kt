@@ -1,6 +1,7 @@
 package io.github.farhazulmullick.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,9 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +27,9 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.http.encodedPath
 
 @Composable
-fun NetLoggingScreen() {
+fun NetLoggingScreen(
+    onItemClick: (Int) -> Unit
+) {
     val logs: SnapshotStateList<NetworkLogs> = LensKtorStateManager.stateCalls
     LazyColumn(
         reverseLayout = true,
@@ -35,12 +37,13 @@ fun NetLoggingScreen() {
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items (logs) {
+        itemsIndexed (logs) {index, item ->
             NetLogCard(
                 modifier = Modifier
+                    .clickable { onItemClick(index) }
                     .background(MaterialTheme.colorScheme.surfaceContainer)
                     .padding(8.dp),
-                netLog = it
+                netLog = item
             )
         }
     }

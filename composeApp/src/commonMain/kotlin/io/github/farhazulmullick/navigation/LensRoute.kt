@@ -8,5 +8,5 @@ sealed class LensRoute {
     object NetLogScreen: LensRoute()
 
     @Serializable
-    object NetLogInfoScreen: LensRoute()
+    data class NetLogInfoScreen(val index: Int): LensRoute()
 }

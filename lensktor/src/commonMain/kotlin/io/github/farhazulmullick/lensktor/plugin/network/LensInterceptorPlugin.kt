@@ -26,7 +26,12 @@ import io.ktor.client.statement.HttpResponsePipeline
 import io.ktor.http.content.OutgoingContent
 import io.ktor.util.AttributeKey
 import io.ktor.util.pipeline.PipelineContext
+import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.InternalAPI
+import io.ktor.utils.io.charsets.Charset
+import io.ktor.utils.io.charsets.Charsets
+import io.ktor.utils.io.core.readText
+import io.ktor.utils.io.readRemaining
 
 
 internal val LensCallLoggingKey = AttributeKey<Int>("LensCallLoggingKey")
@@ -278,3 +283,8 @@ private object ReceiveHook : ClientHook<suspend ReceiveHook.Context.(call: HttpC
     }
 }
 
+suspend inline fun ByteReadChannel.tryReadText(charset: Charset?): String? = try {
+    readRemaining().readText(charset = charset ?: Charsets.UTF_8)
+} catch (cause: Throwable) {
+    null
+}

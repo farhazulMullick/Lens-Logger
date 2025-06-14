@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -39,7 +41,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LensBottomSheet(
+internal fun LensBottomSheet(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
     sheetShape: Shape = RoundedCornerShape(
@@ -52,7 +54,7 @@ fun LensBottomSheet(
     backgroundColor: Color = MaterialTheme.colorScheme.background,
     containerColor:Color = Color.Transparent,
     contentColor:Color = Color.Transparent,
-    showCross: Boolean = true,
+    showCross: Boolean = false,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val windowInsets = BottomSheetDefaults.windowInsets
@@ -137,14 +139,13 @@ private fun CrossButton(
                 }
             }
     ) {
-//        Image(
-//            imageVector = Icons,
-//            contentDescription = null,
-//            modifier = Modifier,
-//        )
+        Image(
+            imageVector = Icons.Outlined.Close,
+            contentDescription = null,
+            modifier = Modifier,
+        )
     }
 }
-
 
 @Composable
 private fun SheetHandle() =

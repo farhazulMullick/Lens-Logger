@@ -22,24 +22,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.farhazulmullick.lensktor.modal.NetworkLogs
 import io.github.farhazulmullick.lensktor.modal.Resource
 import io.github.farhazulmullick.lensktor.plugin.network.LensKtorStateManager
-import io.ktor.client.call.body
-import io.ktor.client.statement.request
-import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.InternalAPI
-import io.ktor.utils.io.charsets.Charset
-import io.ktor.utils.io.core.readText
-import io.ktor.utils.io.readRemaining
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -139,7 +129,7 @@ fun ResponsePageUI(
 
                     // url
                     Text(text = "Url ->")
-                    Text(text = it.request.url.toString())
+                    Text(text = it.request?.url.toString())
 
                     // space
                     VSpacer(12.dp)
@@ -147,18 +137,13 @@ fun ResponsePageUI(
                     // request header
                     Text(text = "Response headers ->")
                     Text("{")
-                    it.headers.entries().forEach { entry ->
-                        Text("      ${entry.key} : ${entry.value}")
+                    it.headers?.forEach { entry ->
+                        Text("  ${entry.key} : ${entry.value}")
                     }
                     Text("}")
-
                     // body
-                    var body by remember { mutableStateOf("") }
                     Text(text = "Response Body ->")
-                    scope.launch() {
-                        body = it.body<String>()
-                    }
-                    Text(body)
+                    Text(it.body ?: "No body found")
                 }
             }
             is Resource.Failed -> {}
@@ -193,10 +178,4 @@ fun RequestPageUI(
             Text("}")
         }
     }
-}
-
-suspend inline fun ByteReadChannel.tryReadText(charset: Charset): String? = try {
-    readRemaining().readText(charset = charset)
-} catch (cause: Throwable) {
-    null
 }

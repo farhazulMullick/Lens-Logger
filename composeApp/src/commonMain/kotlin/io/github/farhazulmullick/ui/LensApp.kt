@@ -1,11 +1,10 @@
 package io.github.farhazulmullick.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +32,7 @@ private const val TAG = "LensApp"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LensApp(
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit = {}
 ) {
     var showContent by remember { mutableStateOf(false) }
@@ -48,26 +48,27 @@ fun LensApp(
             }
         )
     }
-    Button(onClick = {
-        showContent = !showContent
-        if(showContent) {
-            scope.launch {
-                val a = client.get(urlString = "https://jsonplaceholder.typicode.com/comments?postId=1")
-                val body = a.body<String>()
-                Napier.d(tag = TAG) { " response :: hashcode :: ${a.hashCode()}, body :: $body" }
+
+    Box(modifier = modifier) {
+        LensFAB(){
+            showContent = !showContent
+            if(showContent) {
+                scope.launch {
+                    val a = client.get(urlString = "https://jsonplaceholder.typicode.com/comments?postId=1")
+                    val body = a.body<String>()
+                    Napier.d(tag = TAG) { " response :: hashcode :: ${a.hashCode()}, body :: $body" }
+                }
             }
         }
-    }) {
-        Text("Click me!")
+        content()
     }
-    content()
 
-    if (showContent)
-    LensBottomSheet(onDismiss = {
-        showContent = !showContent
-    }) {
-        LensContent()
+    if (showContent){
+        LensBottomSheet(onDismiss = { showContent = !showContent }) {
+            LensContent()
+        }
     }
+
 }
 
 @Composable

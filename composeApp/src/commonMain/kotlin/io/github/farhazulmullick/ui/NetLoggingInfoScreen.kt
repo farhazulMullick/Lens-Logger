@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,9 +42,14 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import io.github.aakira.napier.Napier
+import io.github.farhazulmullick.lensktor.generateCurl
 import io.github.farhazulmullick.lensktor.modal.NetworkLogs
 import io.github.farhazulmullick.lensktor.modal.Resource
 import io.github.farhazulmullick.lensktor.plugin.network.LensKtorStateManager
@@ -54,6 +60,7 @@ enum class TAB(val index: Int) {
     Request(0), Response(1)
 }
 
+private const val TAG = "NetLoggingInfoScreen"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NetLoggingInfoScreen(
@@ -77,6 +84,22 @@ fun NetLoggingInfoScreen(
                     }
                 }
             )
+        },
+        bottomBar = {
+            // using deprecated api since new clipboard api in compose 1.8 is trivial to use.
+            val clipboard: ClipboardManager = LocalClipboardManager.current
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                onClick = {
+                    val curl = netLogs?.requestData?.generateCurl()
+                    curl ?.let { clipboard.setText(AnnotatedString(curl)) }
+                    Napier.d(tag = TAG){"$TAG :: cURL :: ${netLogs?.requestData?.generateCurl()}"}
+                }
+            ) {
+                Text("Copy cURL")
+            }
         }
     ){
         Column(

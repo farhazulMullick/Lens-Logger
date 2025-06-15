@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -31,11 +30,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,6 +47,10 @@ import io.github.farhazulmullick.lensktor.plugin.network.LensKtorStateManager
 import io.ktor.utils.io.InternalAPI
 import kotlinx.coroutines.launch
 
+enum class TAB(val index: Int) {
+    Request(0), Response(1)
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NetLoggingInfoScreen(
@@ -55,8 +60,7 @@ fun NetLoggingInfoScreen(
         modifier = Modifier,
         topBar = {
             TopAppBar(
-                modifier = Modifier
-                    .offset(y = (-12).dp),
+                modifier = Modifier,
                 title = {
                     Text(text = "Api Details", style = MaterialTheme.typography.titleLarge)
                 }, navigationIcon = {
@@ -67,37 +71,30 @@ fun NetLoggingInfoScreen(
             )
         }
     ){
-        Column (modifier = Modifier.padding(it).fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+        ) {
             val pagerState = rememberPagerState() { 2 }
             val scope = rememberCoroutineScope()
             val netLogs: NetworkLogs? = LensKtorStateManager.stateCalls.getOrNull(index)
+            var selectedTab by remember { mutableStateOf(TAB.Request) }
             Row(modifier = Modifier.fillMaxWidth()) {
-                // Request-tab
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable {
-                            scope.launch {
-                                pagerState.scrollToPage(0)
-                            }
-                        }
-                ) {
-                    Text("Request", modifier = Modifier)
-                }
-
-                // Response-tab
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable {
-                            scope.launch {
-                                pagerState.scrollToPage(1)
-                            }
-                        }
-                ) {
-                    Text("Response")
+                TAB.entries.forEach { it ->
+                    BoxTab(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable {
+                                scope.launch {
+                                    pagerState.animateScrollToPage(it.index)
+                                    selectedTab = it
+                                }
+                            },
+                        tabTitle = it.name,
+                        isSelected = selectedTab == it
+                    )
                 }
             }
 
@@ -115,7 +112,41 @@ fun NetLoggingInfoScreen(
                     )
                 }
             }
+
+            LaunchedEffect(pagerState) {
+                // Collect from the a snapshotFlow reading the currentPage
+                snapshotFlow { pagerState.currentPage }.collect { page ->
+                    when(page) {
+                        0 -> selectedTab = TAB.Request
+                        1 -> selectedTab = TAB.Response
+                    }
+                }
+            }
         }
+    }
+}
+
+@Composable
+fun BoxTab(
+    modifier: Modifier = Modifier,
+    tabTitle: String,
+    isSelected: Boolean = false
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .clip(RoundedCornerShape(100))
+            .background(
+                color = if (isSelected) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.surface
+            )
+            .padding(4.dp)
+            .then(modifier)
+    ) {
+        Text(tabTitle, modifier = Modifier,
+            color = if (isSelected) MaterialTheme.colorScheme.onPrimary
+            else MaterialTheme.colorScheme.onSurface,
+        )
     }
 }
 
@@ -134,17 +165,39 @@ fun ResponsePageUI(
             is Resource.Success -> {
                 modal.responseData?.let {
                     // status
-                    Row {
-                        Text(text="Status ->")
-                        Text(text = "${it.status}")
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                            .clip(shape = RoundedCornerShape(8.dp))
+                            .background(color = MaterialTheme.colorScheme.surfaceContainer)
+                            .padding(16.dp)
+                    ) {
+                        Row {
+                            Text(
+                                text = "Status: ",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "${it.status}",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+
+                        VSpacer(12.dp)
+                        // url
+                        Row {
+                            Text(
+                                text = "Url: ", style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = it.request?.url.toString(),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                     }
-
-                    // space
-                    VSpacer(12.dp)
-
-                    // url
-                    Text(text = "Url ->")
-                    Text(text = it.request?.url.toString())
 
                     // space
                     VSpacer(12.dp)
@@ -213,7 +266,7 @@ fun ExpandableCard(
     Column(
         modifier = Modifier.fillMaxWidth()
             .clip(shape = RoundedCornerShape(8.dp))
-            .background(color = MaterialTheme.colorScheme.surfaceVariant)
+            .background(color = MaterialTheme.colorScheme.surfaceContainer)
             .padding(16.dp)
             .then(modifier)
     ) {

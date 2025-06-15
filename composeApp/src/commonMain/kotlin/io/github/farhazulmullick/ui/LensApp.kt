@@ -54,9 +54,9 @@ fun LensApp(
             showContent = !showContent
             if(showContent) {
                 scope.launch {
-                    val a = client.get(urlString = "https://jsonplaceholder.typicode.com/comments?postId=1")
-                    val body = a.body<String>()
-                    Napier.d(tag = TAG) { " response :: hashcode :: ${a.hashCode()}, body :: $body" }
+                    val response = client.get(urlString = "https://jsonplaceholder.typicode.com/comments?postId=100")
+                    val body = response.body<String>()
+                    Napier.d(tag = TAG) { " response :: hashcode :: ${response.hashCode()}, body :: $body" }
                 }
             }
         }

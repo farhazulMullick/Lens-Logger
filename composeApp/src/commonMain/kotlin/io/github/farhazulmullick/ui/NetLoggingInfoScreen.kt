@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,6 +41,8 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.farhazulmullick.lensktor.modal.NetworkLogs
 import io.github.farhazulmullick.lensktor.modal.Resource
@@ -56,14 +59,19 @@ enum class TAB(val index: Int) {
 fun NetLoggingInfoScreen(
     index: Int,
     onBackClick: () -> Unit) {
+    val netLogs: NetworkLogs? = LensKtorStateManager.stateCalls.getOrNull(index)
     Scaffold (
-        modifier = Modifier,
+        modifier = Modifier.border(width = 1.dp, color = MaterialTheme.colorScheme.outline),
         topBar = {
             TopAppBar(
                 modifier = Modifier,
                 title = {
-                    Text(text = "Api Details", style = MaterialTheme.typography.titleLarge)
-                }, navigationIcon = {
+                    Text(
+                        text = "${netLogs?.responseData?.status?.toString()}", style = MaterialTheme.typography.titleLarge,
+                        fontFamily = FontFamily.Monospace
+                    )
+                },
+                navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Image(imageVector = Icons.AutoMirrored.Filled.ArrowBack, null)
                     }
@@ -79,13 +87,12 @@ fun NetLoggingInfoScreen(
         ) {
             val pagerState = rememberPagerState() { 2 }
             val scope = rememberCoroutineScope()
-            val netLogs: NetworkLogs? = LensKtorStateManager.stateCalls.getOrNull(index)
             var selectedTab by remember { mutableStateOf(TAB.Request) }
             Row(modifier = Modifier.fillMaxWidth()) {
                 TAB.entries.forEach { it ->
                     BoxTab(
                         modifier = Modifier
-                            .weight(1f)
+                            .weight(0.5f)
                             .clickable {
                                 scope.launch {
                                     pagerState.animateScrollToPage(it.index)
@@ -146,6 +153,10 @@ fun BoxTab(
         Text(tabTitle, modifier = Modifier,
             color = if (isSelected) MaterialTheme.colorScheme.onPrimary
             else MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontFamily = FontFamily.Monospace,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+            )
         )
     }
 }
@@ -174,13 +185,17 @@ fun ResponsePageUI(
                         Row {
                             Text(
                                 text = "Status: ",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontFamily = FontFamily.Monospace,
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                             Text(
-                                text = "${it.status}",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface
+                                text = "${it.status?.value}",
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontFamily = FontFamily.Monospace,
+                                style = MaterialTheme.typography.bodyMedium,
                             )
                         }
 
@@ -188,13 +203,18 @@ fun ResponsePageUI(
                         // url
                         Row {
                             Text(
-                                text = "Url: ", style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface
+                                text = "URL: ",
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontFamily = FontFamily.Monospace,
+                                        fontWeight = FontWeight.Bold
+                                    ),
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                             Text(
                                 text = it.request?.url.toString(),
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontFamily = FontFamily.Monospace,
+                                style = MaterialTheme.typography.bodyMedium,
                             )
                         }
                     }
@@ -202,7 +222,7 @@ fun ResponsePageUI(
                     // space
                     VSpacer(12.dp)
 
-                    // request header
+                    // response header
                     var isRequestExpanded by remember { mutableStateOf(false) }
                     ExpandableCard(
                         title = "Response Headers",
@@ -217,7 +237,8 @@ fun ResponsePageUI(
                                     it.headers?.forEach { entry ->
                                         Text(text = "${entry.key} : ${entry.value}",
                                             color = MaterialTheme.colorScheme.onSurface,
-                                            style = MaterialTheme.typography.bodyLarge
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontFamily = FontFamily.Monospace
                                         )
                                     }
                                 }
@@ -240,7 +261,9 @@ fun ResponsePageUI(
                                     VSpacer(16.dp)
                                     Text(
                                         modifier = Modifier.animateContentSize(), text = it.body ?: "No body found",
-                                        color = MaterialTheme.colorScheme.onSurface
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        fontFamily = FontFamily.Monospace,
+                                        style = MaterialTheme.typography.bodyMedium,
                                     )
                                 }
                             }
@@ -310,14 +333,20 @@ fun RequestPageUI(
                 // url
                 Row {
                     Text(
-                        text = "URL: ", style = MaterialTheme.typography.titleMedium,
+                        text = "URL: ",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = FontWeight.Bold
+                        ),
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     SelectionContainer {
                         Text(
                             text = it.url.toString(),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontFamily = FontFamily.Monospace
+                                ),
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }
@@ -341,7 +370,9 @@ fun RequestPageUI(
                             it.headers.entries().forEach { entry ->
                                 Text(text = "${entry.key} : ${entry.value}",
                                     color = MaterialTheme.colorScheme.onSurface,
-                                    style = MaterialTheme.typography.bodyLarge
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontFamily = FontFamily.Monospace,
+                                    ),
                                 )
                             }
                         }

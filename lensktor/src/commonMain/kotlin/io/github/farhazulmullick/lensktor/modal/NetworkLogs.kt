@@ -8,6 +8,7 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.request
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.charset
 import io.ktor.http.content.OutgoingContent
 import io.ktor.http.contentType
@@ -32,15 +33,17 @@ data class NetworkLogs(
     val responseData = if (response is Resource.Success) response.data else null
 }
 
-fun HttpRequestBuilder.contentLength(): Long? {
-    return this.headers[HttpHeaders.ContentLength]?.toLongOrNull()
+fun HttpRequestBuilder.contentLength(): String? {
+    val data = this.headers[HttpHeaders.ContentLength]?.toIntOrNull()?.formatDataPacket()
         ?: this.body.let { body ->
             when (body) {
-                is OutgoingContent.NoContent -> 0L
-                is OutgoingContent -> body.contentLength
+                is OutgoingContent.NoContent -> 0.formatDataPacket()
+                is OutgoingContent -> body.contentLength?.toInt()?.formatDataPacket()
                 else -> null
             }
         }
+
+    return data
 }
 
 @OptIn(InternalAPI::class)
@@ -55,22 +58,22 @@ suspend fun HttpResponse?.toResponseData(): ResponseData {
         null
     }
     return ResponseData(
-        status = this?.status?.value,
+        status = HttpStatusCode.allStatusCodes.find { it == this?.status },
         headers = this?.headers?.entries()?.associate { it.key to it.value.joinToString() },
         body = prettyJson,
         request = this?.request,
-        contentLength = (bodyAsText?.toByteArray(Charsets.UTF_8)?.size ?: 0).let {
-            when {
-                it >= 1024f * 1024f -> "${it / (1024f * 1024f)} MB"
-                it >= 1024f -> "${(it / 1024f)} KB"
-                else -> "$it B"
-            }
-        }
+        contentLength = (bodyAsText?.toByteArray(Charsets.UTF_8)?.size ?: 0).formatDataPacket()
     )
 }
 
+fun Int.formatDataPacket(): String? = when {
+    this >= 1024f * 1024f -> "${this / (1024f * 1024f)} MB"
+    this >= 1024f -> "${(this / 1024f)} KB"
+    else -> "$this B"
+}
+
 data class ResponseData(
-    val status: Int? = null,
+    val status: HttpStatusCode? = null,
     val headers: Map<String, String>? = null,
     val body: String? = null,
     val request: HttpRequest? = null,

@@ -11,8 +11,6 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.request
 import io.ktor.utils.io.InternalAPI
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.time.Clock
@@ -21,7 +19,6 @@ import kotlin.time.ExperimentalTime
 object LensKtorStateManager {
     val stateCalls : SnapshotStateList<NetworkLogs> = mutableStateListOf<NetworkLogs>()
     val mutex: Mutex = Mutex()
-    private val scope = CoroutineScope(Job())
     private val TAG = "LensKtorStateManager"
 
     @OptIn(ExperimentalTime::class)

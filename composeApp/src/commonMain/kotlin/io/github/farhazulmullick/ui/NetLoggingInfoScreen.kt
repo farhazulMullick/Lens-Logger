@@ -34,7 +34,9 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NetLoggingInfoScreen(index: Int) {
+fun NetLoggingInfoScreen(
+    index: Int,
+    onBackClick: () -> Unit) {
     Scaffold (
         modifier = Modifier,
         topBar = {
@@ -44,8 +46,7 @@ fun NetLoggingInfoScreen(index: Int) {
                 title = {
                     Text(text = "Api Details", style = MaterialTheme.typography.titleLarge)
                 }, navigationIcon = {
-                    IconButton(onClick = {
-                    }) {
+                    IconButton(onClick = onBackClick) {
                         Image(imageVector = Icons.AutoMirrored.Filled.ArrowBack, null)
                     }
                 }

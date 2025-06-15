@@ -37,7 +37,6 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(projects.lensktor)
-
             // compose
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -56,6 +55,7 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.json.serializer)
 
+            implementation("org.jetbrains.kotlin:kotlin-stdlib-common")
             implementation(libs.napier)
         }
 

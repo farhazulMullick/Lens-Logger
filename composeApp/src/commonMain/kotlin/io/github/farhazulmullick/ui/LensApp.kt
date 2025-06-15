@@ -87,7 +87,9 @@ internal fun LensContent(){
                 }
                 composable<LensRoute.NetLogInfoScreen> {entry ->
                     val data: LensRoute.NetLogInfoScreen = entry.toRoute<LensRoute.NetLogInfoScreen>()
-                    NetLoggingInfoScreen(index = data.index)
+                    NetLoggingInfoScreen(index = data.index) {
+                        navController.navigateUp()
+                    }
                 }
             }
         }

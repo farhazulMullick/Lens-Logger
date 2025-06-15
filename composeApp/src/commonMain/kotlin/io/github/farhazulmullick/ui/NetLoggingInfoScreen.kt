@@ -301,20 +301,53 @@ fun RequestPageUI(
     Column(modifier = modifier.verticalScroll(rememberScrollState()), ) {
         modal?.requestData?.let {
             // url
-            Text(text = "Url ->")
-            Text(text = it.url.toString())
+            Column(
+                modifier = Modifier.fillMaxWidth()
+                    .clip(shape = RoundedCornerShape(8.dp))
+                    .background(color = MaterialTheme.colorScheme.surfaceContainer)
+                    .padding(16.dp)
+            ) {
+                // url
+                Row {
+                    Text(
+                        text = "URL: ", style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    SelectionContainer {
+                        Text(
+                            text = it.url.toString(),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
 
             // space
             VSpacer(12.dp)
 
             // request header
-            Text(text = "Request headers ->")
-
-            Text("{")
-            it.headers.entries().forEach { entry ->
-                Text("      ${entry.key} : ${entry.value}")
-            }
-            Text("}")
+            var isRequestExpanded by remember { mutableStateOf(true) }
+            ExpandableCard(
+                title = "Request Headers",
+                isExpanded = isRequestExpanded,
+                onClick = {
+                    isRequestExpanded = !isRequestExpanded
+                },
+                content = {
+                    SelectionContainer {
+                        Column (Modifier.fillMaxWidth()){
+                            VSpacer(16.dp)
+                            it.headers.entries().forEach { entry ->
+                                Text(text = "${entry.key} : ${entry.value}",
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
+                        }
+                    }
+                }
+            )
         }
     }
 }

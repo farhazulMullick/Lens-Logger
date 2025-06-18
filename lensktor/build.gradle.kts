@@ -4,6 +4,41 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.vanniktech.publish)
+}
+
+mavenPublishing {
+    coordinates(
+        groupId = "io.github.farhazulmullick",
+        artifactId = "lens-ktor",
+        version = "1.0.0-beta01"
+    )
+
+    pom {
+        name.set("Lens Ktor")
+        description.set("A description of what my library does.")
+        inceptionYear.set("2025")
+        url.set("https://github.com/farhazulmullick/Lens/")
+        licenses {
+            license {
+                name.set("MIT License")
+                url.set("https://opensource.org/licenses/MIT")
+                distribution.set("repo")
+            }
+        }
+        developers {
+            developer {
+                id.set("farhazulmullick")
+                name.set("Farhazul Mullick")
+                url.set("https://github.com/farhazulMullick/")
+            }
+        }
+        scm {
+            url.set("https://github.com/farhazulmullick/Lens/")
+            connection.set("scm:git:git://github.com/farhazulmullick/Lens.git")
+            developerConnection.set("scm:git:ssh://git@github.com/farhazulmullick/Lens.git")
+        }
+    }
 }
 
 kotlin {
@@ -65,6 +100,7 @@ kotlin {
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.client.logging)
                 implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.client.serializer)
                 implementation(libs.ktor.json.serializer)
                 implementation(libs.napier)
             }

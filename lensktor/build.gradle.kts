@@ -11,14 +11,14 @@ mavenPublishing {
     coordinates(
         groupId = "io.github.farhazulmullick",
         artifactId = "lens-ktor",
-        version = "1.0.0-beta01"
+        version = "1.0.0-SNAPSHOT01"
     )
 
     pom {
         name.set("Lens Ktor")
         description.set("A description of what my library does.")
         inceptionYear.set("2025")
-        url.set("https://github.com/farhazulmullick/Lens/")
+        url.set("https://github.com/farhazulMullick/Lens/")
         licenses {
             license {
                 name.set("MIT License")
@@ -28,15 +28,15 @@ mavenPublishing {
         }
         developers {
             developer {
-                id.set("farhazulmullick")
+                id.set("farhazulMullick")
                 name.set("Farhazul Mullick")
                 url.set("https://github.com/farhazulMullick/")
             }
         }
         scm {
-            url.set("https://github.com/farhazulmullick/Lens/")
-            connection.set("scm:git:git://github.com/farhazulmullick/Lens.git")
-            developerConnection.set("scm:git:ssh://git@github.com/farhazulmullick/Lens.git")
+            url.set("https://github.com/farhazulMullick/Lens/")
+            connection.set("scm:git:git://github.com/farhazulMullick/Lens.git")
+            developerConnection.set("scm:git:ssh://git@github.com/farhazulMullick/Lens.git")
         }
     }
 }

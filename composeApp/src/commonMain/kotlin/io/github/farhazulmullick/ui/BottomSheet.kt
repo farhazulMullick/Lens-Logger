@@ -18,7 +18,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -50,14 +49,13 @@ internal fun LensBottomSheet(
     ),
     sheetElevation: Dp = 0.dp,
     sheetState: SheetState = rememberModalBottomSheetState(),
-    scrimColor:Color = MaterialTheme.colorScheme.scrim,
+    scrimColor:Color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f),
     backgroundColor: Color = MaterialTheme.colorScheme.background,
     containerColor:Color = Color.Transparent,
     contentColor:Color = Color.Transparent,
     showCross: Boolean = false,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val windowInsets = BottomSheetDefaults.windowInsets
     val scope = rememberCoroutineScope()
     ModalBottomSheet(
         scrimColor = scrimColor,

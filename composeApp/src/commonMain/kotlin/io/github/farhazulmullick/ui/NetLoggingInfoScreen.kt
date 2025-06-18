@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -68,7 +67,7 @@ fun NetLoggingInfoScreen(
     onBackClick: () -> Unit) {
     val netLogs: NetworkLogs? = LensKtorStateManager.stateCalls.getOrNull(index)
     Scaffold (
-        modifier = Modifier.border(width = 1.dp, color = MaterialTheme.colorScheme.outline),
+        modifier = Modifier,
         topBar = {
             TopAppBar(
                 modifier = Modifier,

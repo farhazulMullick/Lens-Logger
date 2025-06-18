@@ -9,21 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import io.github.aakira.napier.Napier
 import io.github.farhazulmullick.navigation.LensRoute
-import io.github.farhazulmullick.network.HttpKtorClient
-import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.http.HeadersBuilder
-import io.ktor.http.Url
-import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -36,30 +28,9 @@ fun LensApp(
     content: @Composable () -> Unit = {}
 ) {
     var showContent by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    val client = remember {
-        HttpKtorClient(
-            hostURL = Url(urlString = "https://jsonplaceholder.typicode.com").host,
-            headers = {
-                HeadersBuilder().apply {
-                    append("header1", "Data_1")
-                    append("header2", "Data_2")
-                }
-            }
-        )
-    }
 
     Box(modifier = modifier) {
-        LensFAB(){
-            showContent = !showContent
-            if(showContent) {
-                scope.launch {
-                    val response = client.get(urlString = "https://jsonplaceholder.typicode.com/comments?postId=100")
-                    val body = response.body<String>()
-                    Napier.d(tag = TAG) { " response :: hashcode :: ${response.hashCode()}, body :: $body" }
-                }
-            }
-        }
+        LensFAB(){ showContent = !showContent }
         content()
     }
 
@@ -68,7 +39,6 @@ fun LensApp(
             LensContent()
         }
     }
-
 }
 
 @Composable

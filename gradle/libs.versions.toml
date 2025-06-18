@@ -14,6 +14,7 @@ composeMultiplatform = "1.8.1"
 junit = "4.13.2"
 kotlin = "2.1.21"
 kotlinStdlib = "2.1.21"
+lensKtor = "1.0.0-beta01"
 runner = "1.5.2"
 core = "1.5.0"
 ktorVersion = "3.0.1"
@@ -42,6 +43,7 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorVer
 ktor-client-android-engine = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorVersion" }
 ktor-client-ios-engine = { module = "io.ktor:ktor-client-ios", version.ref = "ktorVersion" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorVersion" }
+lens-ktor = { module = "io.github.farhazulmullick:lens-ktor", version.ref = "lensKtor" }
 napier = { module = "io.github.aakira:napier", version.ref = "napierVersion" }
 
 [plugins]

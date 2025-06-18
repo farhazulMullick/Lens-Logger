@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.vanniktech.publish)
 }
 
 kotlin {
@@ -36,7 +37,7 @@ kotlin {
             implementation(libs.ktor.client.android.engine)
         }
         commonMain.dependencies {
-            implementation(projects.lensktor)
+            implementation(libs.lens.ktor) // Replace with your actual core library dependency
             // compose
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -53,6 +54,7 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.client.serializer)
             implementation(libs.ktor.json.serializer)
 
             implementation("org.jetbrains.kotlin:kotlin-stdlib-common")

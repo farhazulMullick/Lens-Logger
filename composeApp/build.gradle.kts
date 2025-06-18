@@ -1,4 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -7,6 +6,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.vanniktech.publish)
 }
 
 kotlin {
@@ -33,24 +34,35 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.ktor.client.android.engine)
         }
         commonMain.dependencies {
+            implementation(libs.lens.ktor) // Replace with your actual core library dependency
+            // compose
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
+            implementation(compose.materialIconsExtended)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.androidx.navigation)
 
-            implementation(projects.lensktor)
+            // ktor
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.client.serializer)
             implementation(libs.ktor.json.serializer)
 
+            implementation("org.jetbrains.kotlin:kotlin-stdlib-common")
             implementation(libs.napier)
+        }
+
+        iosMain.dependencies {
+            implementation(libs.ktor.client.ios.engine)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

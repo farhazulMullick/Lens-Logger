@@ -3,6 +3,42 @@ plugins {
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.vanniktech.publish)
+}
+
+mavenPublishing {
+    coordinates(
+        groupId = "io.github.farhazulmullick",
+        artifactId = "lens-ktor",
+        version = "1.0.0-SNAPSHOT01"
+    )
+
+    pom {
+        name.set("Lens Ktor")
+        description.set("A description of what my library does.")
+        inceptionYear.set("2025")
+        url.set("https://github.com/farhazulMullick/Lens/")
+        licenses {
+            license {
+                name.set("MIT License")
+                url.set("https://opensource.org/licenses/MIT")
+                distribution.set("repo")
+            }
+        }
+        developers {
+            developer {
+                id.set("farhazulMullick")
+                name.set("Farhazul Mullick")
+                url.set("https://github.com/farhazulMullick/")
+            }
+        }
+        scm {
+            url.set("https://github.com/farhazulMullick/Lens/")
+            connection.set("scm:git:git://github.com/farhazulMullick/Lens.git")
+            developerConnection.set("scm:git:ssh://git@github.com/farhazulMullick/Lens.git")
+        }
+    }
 }
 
 kotlin {
@@ -60,21 +96,13 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
-                implementation(compose.runtime)
-                implementation(compose.ui)
-                implementation(compose.uiTooling)
-                implementation(compose.foundation)
-                implementation(compose.components.resources)
-                implementation(compose.components.uiToolingPreview)
-                implementation(libs.androidx.lifecycle.viewmodel)
-                implementation(libs.androidx.lifecycle.runtimeCompose)
                 implementation(compose.material3)
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.client.logging)
                 implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.client.serializer)
                 implementation(libs.ktor.json.serializer)
                 implementation(libs.napier)
-                // Add KMP dependencies here
             }
         }
 

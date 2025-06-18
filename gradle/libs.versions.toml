@@ -19,6 +19,7 @@ core = "1.5.0"
 ktorVersion = "3.0.1"
 napierVersion = "2.6.1"
 jbNavigation = "2.9.0-beta01"
+vanniktech = "0.32.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -35,6 +36,7 @@ androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
 androidx-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "jbNavigation" }
 
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorVersion" }
+ktor-client-serializer = { module = "io.ktor:ktor-client-serialization", version.ref = "ktorVersion" }
 ktor-json-serializer = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorVersion" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorVersion" }
 ktor-client-android-engine = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorVersion" }
@@ -50,3 +52,4 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+vanniktech-publish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktech" }

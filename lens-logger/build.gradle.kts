@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidKotlinMultiplatformLibrary)
+    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
@@ -42,11 +42,6 @@ mavenPublishing {
 }
 
 kotlin {
-    androidLibrary {
-        namespace = "io.github.farhazulmullick.lensloggger"
-        compileSdk = 35
-        minSdk = 24
-    }
     val xcfName = "lensktorKit"
 
     iosX64 {
@@ -67,11 +62,6 @@ kotlin {
         }
     }
 
-// Source set declarations.
-// Declaring a target automatically creates a source set with the same name. By default, the
-// Kotlin Gradle Plugin creates additional source sets that depend on each other, since it is
-// common to share sources between related targets.
-// See: https://kotlinlang.org/docs/multiplatform-hierarchy.html
     sourceSets {
         commonMain {
             dependencies {
@@ -111,4 +101,26 @@ kotlin {
         }
     }
 
+}
+
+android {
+    namespace = "io.github.farhazulmullick.lenslogger"
+    buildFeatures {
+        compose = true
+        dataBinding = true
+    }
+
+    compileSdk = 34
+    defaultConfig {
+        minSdk = 23
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlin {
+        androidTarget()
+        jvmToolchain(17)
+    }
 }

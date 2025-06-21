@@ -1,4 +1,3 @@
-rootProject.name = "Lens"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
@@ -30,5 +29,6 @@ dependencyResolutionManagement {
     }
 }
 
+rootProject.name = "lens"
 include(":composeApp")
-include(":lensktor")
+include(":lens-module")

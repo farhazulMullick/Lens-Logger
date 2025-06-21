@@ -10,7 +10,7 @@ plugins {
 mavenPublishing {
     coordinates(
         groupId = "io.github.farhazulmullick",
-        artifactId = "lens",
+        artifactId = "lens-module",
         version = "1.0.0-alpha01"
     )
 
@@ -47,7 +47,7 @@ kotlin {
 // which platforms this KMP module supports.
 // See: https://kotlinlang.org/docs/multiplatform-discover-project.html#targets
     androidLibrary {
-        namespace = "io.github.farhazulmullick.lens"
+        namespace = "io.github.farhazulmullick.lens-module"
         compileSdk = 35
         minSdk = 24
 

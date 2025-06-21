@@ -37,7 +37,8 @@ kotlin {
             implementation(libs.ktor.client.android.engine)
         }
         commonMain.dependencies {
-            implementation(projects.lensModule) // Replace with your actual core library dependency
+            implementation(projects.lensLogger) // Replace with your actual core library dependency
+            //implementation(libs.lens.module)
             // compose
             implementation(compose.runtime)
             implementation(compose.foundation)

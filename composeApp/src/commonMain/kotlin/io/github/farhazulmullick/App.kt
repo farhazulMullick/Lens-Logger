@@ -10,8 +10,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import io.github.farhazulmullick.lensktor.ui.Comment
-import io.github.farhazulmullick.lensktor.ui.LensApp
+import io.github.farhazulmullick.lenslogger.ui.Comment
+import io.github.farhazulmullick.lenslogger.ui.LensApp
 import io.github.farhazulmullick.network.HttpKtorClient
 import io.ktor.client.request.request
 import io.ktor.client.request.setBody

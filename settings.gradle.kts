@@ -31,4 +31,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "lens"
 include(":composeApp")
-include(":lens-module")
+include(":lens-logger")

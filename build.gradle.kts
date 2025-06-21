@@ -17,8 +17,5 @@ allprojects {
         mavenCentral()
         maven("https://jitpack.io")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        //for dependencies libraries also enable VPN to access PW dependencies
-        maven("https://nexus3.penpencil.co/repository/maven-hosted-snapshots/")
-        maven(url = "https://maven.juspay.in/jp-build-packages/hyper-sdk/")
     }
 }

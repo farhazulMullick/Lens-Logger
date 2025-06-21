@@ -1,4 +1,4 @@
-package io.github.farhazulmullick.ui
+package io.github.farhazulmullick.lensktor.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize

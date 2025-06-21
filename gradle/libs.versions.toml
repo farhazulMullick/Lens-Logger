@@ -8,18 +8,18 @@ androidx-appcompat = "1.7.0"
 androidx-constraintlayout = "2.2.1"
 androidx-core = "1.16.0"
 androidx-espresso = "3.6.1"
-androidx-lifecycle = "2.9.0"
+androidx-lifecycle = "2.8.0"
 androidx-testExt = "1.2.1"
 composeMultiplatform = "1.8.1"
 junit = "4.13.2"
 kotlin = "2.1.21"
 kotlinStdlib = "2.1.21"
-lensKtor = "1.0.0-beta01"
+lens = "1.0.0-alpha01"
 runner = "1.5.2"
 core = "1.5.0"
 ktorVersion = "3.0.1"
 napierVersion = "2.6.1"
-jbNavigation = "2.9.0-beta01"
+jbNavigation = "2.9.0-alpha14"
 vanniktech = "0.32.0"
 
 [libraries]
@@ -43,7 +43,7 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorVer
 ktor-client-android-engine = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorVersion" }
 ktor-client-ios-engine = { module = "io.ktor:ktor-client-ios", version.ref = "ktorVersion" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorVersion" }
-lens-ktor = { module = "io.github.farhazulmullick:lens-ktor", version.ref = "lensKtor" }
+lens-ktor = { module = "io.github.farhazulmullick:lens", version.ref = "lens" }
 napier = { module = "io.github.aakira:napier", version.ref = "napierVersion" }
 
 [plugins]

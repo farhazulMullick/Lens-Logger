@@ -1,4 +1,4 @@
-package io.github.farhazulmullick.ui
+package io.github.farhazulmullick.lensktor.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,11 +11,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.zIndex
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import io.github.farhazulmullick.navigation.LensRoute
+import io.github.farhazulmullick.lensktor.navigation.LensRoute
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -30,7 +31,7 @@ fun LensApp(
     var showContent by remember { mutableStateOf(false) }
 
     Box(modifier = modifier) {
-        LensFAB(){ showContent = !showContent }
+        LensFAB(modifier = Modifier.zIndex(Float.MAX_VALUE)){ showContent = !showContent }
         content()
     }
 

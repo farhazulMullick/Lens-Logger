@@ -4,16 +4,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import io.github.farhazulmullick.lensktor.ui.Comment
+import io.github.farhazulmullick.lensktor.ui.LensApp
 import io.github.farhazulmullick.network.HttpKtorClient
-import io.github.farhazulmullick.ui.Comment
-import io.github.farhazulmullick.ui.LensApp
 import io.ktor.client.request.request
 import io.ktor.client.request.setBody
 import io.ktor.http.HeadersBuilder
@@ -27,13 +26,11 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
-        LensApp(modifier = Modifier
-            .safeContentPadding()
-            .fillMaxSize()
-        ){
-            AppContent()
-        }
+    LensApp(modifier = Modifier
+        .safeContentPadding()
+        .fillMaxSize()
+    ){
+        AppContent()
     }
 }
 

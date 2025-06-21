@@ -1,4 +1,4 @@
-package io.github.farhazulmullick.ui
+package io.github.farhazulmullick.lensktor.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,6 +26,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import io.github.farhazulmullick.lensktor.modal.NetworkLogs
 import io.github.farhazulmullick.lensktor.modal.Resource
@@ -75,13 +76,13 @@ fun NetLogCard(
         ) {
             when(netLog.response) {
                 is Resource.Loading -> {
-                    Text("In Progress...", style = MaterialTheme.typography.titleMedium)
+                    Text("In Progress...", style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Monospace))
                 }
                 else -> {
                     netLog.responseData?.apply {
                         Text(
                             status.toString(),
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Monospace),
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -93,7 +94,8 @@ fun NetLogCard(
 
         // Path
         request?.url?.encodedPath?.let {
-            Text(it, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+            Text(it, style = MaterialTheme.typography.bodyLarge
+                .copy(fontFamily = FontFamily.Monospace), color = MaterialTheme.colorScheme.onSurface)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -107,13 +109,15 @@ fun NetLogCard(
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically) {
                     // method
-                    Text(it.method.value, style = MaterialTheme.typography.labelLarge)
+                    Text(it.method.value, style = MaterialTheme.typography.labelLarge
+                        .copy(fontFamily = FontFamily.Monospace)
+                    )
                     // uploaded data.
                     Icon(modifier = Modifier.alpha(0.5f), imageVector = Icons.Outlined.Upload, contentDescription = null)
-                    Text(it.contentLength().toString(), style = MaterialTheme.typography.bodyMedium)
+                    Text(it.contentLength().toString(), style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace))
                     // downloaded data
                     Icon(modifier = Modifier.alpha(0.5f),  imageVector = Icons.Filled.Download, contentDescription = null)
-                    Text(netLog.responseData?.contentLength.toString(), style = MaterialTheme.typography.bodyMedium)
+                    Text(netLog.responseData?.contentLength.toString(), style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace))
                 }
             }
 
@@ -126,7 +130,10 @@ fun NetLogCard(
                 )
                 netLog.responseTime?.let {
                     // time ago
-                    Text(it.toString() + "ms", style = MaterialTheme.typography.labelSmall)
+                    Text(it.toString() + "ms",
+                        style = MaterialTheme.typography.labelSmall
+                        .copy(fontFamily = FontFamily.Monospace)
+                    )
                 }
             }
         }

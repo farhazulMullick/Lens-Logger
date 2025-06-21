@@ -1,4 +1,4 @@
-package io.github.farhazulmullick.navigation
+package io.github.farhazulmullick.lensktor.navigation
 
 import kotlinx.serialization.Serializable
 

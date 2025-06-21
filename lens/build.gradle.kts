@@ -10,8 +10,8 @@ plugins {
 mavenPublishing {
     coordinates(
         groupId = "io.github.farhazulmullick",
-        artifactId = "lens-ktor",
-        version = "1.0.0-SNAPSHOT01"
+        artifactId = "lens",
+        version = "1.0.0-alpha01"
     )
 
     pom {
@@ -47,7 +47,7 @@ kotlin {
 // which platforms this KMP module supports.
 // See: https://kotlinlang.org/docs/multiplatform-discover-project.html#targets
     androidLibrary {
-        namespace = "io.github.farhazulmullick.lensktor"
+        namespace = "io.github.farhazulmullick.lens"
         compileSdk = 35
         minSdk = 24
 
@@ -97,6 +97,16 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.stdlib)
                 implementation(compose.material3)
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.ui)
+                implementation(compose.materialIconsExtended)
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+                implementation(libs.androidx.lifecycle.viewmodel)
+                implementation(libs.androidx.lifecycle.runtimeCompose)
+                implementation(libs.androidx.navigation)
+
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.client.logging)
                 implementation(libs.ktor.client.content.negotiation)

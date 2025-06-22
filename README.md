@@ -11,12 +11,17 @@ LensLogger is a Kotlin Multiplatform (KMP) library for Android and iOS that make
 
 ## Installation
 
-Add the LensLogger artifact to your shared module's dependencies using the version catalog:
+Add the LensLogger artifact to your module's commonMain dependencies:
 
 ```kotlin
 dependencies {
     implementation("io.github.farhazulmullick:lens-logger:0.0.1-alpha01")
 }
+```
+Or add to your `libs.versions.toml`:
+```toml
+lensVersion = "0.0.1-alpha01"
+lens-logger = { module = "io.github.farhazulmullick:lens-logger", version.ref = "lensVersion" }
 ```
 
 ## Usage
@@ -26,7 +31,7 @@ dependencies {
 In your shared code (e.g., `commonMain`):
 
 ```kotlin
-import io.github.farhazulmullick.lenslogger.LensLogger
+import io.github.farhazulmullick.lenslogger.*
 import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.plugins.logging.*
@@ -48,13 +53,10 @@ val client = HttpClient(engine) {
 }
 ```
 
-## Setup LensApp UI
+### 2. Setup LensApp UI
 
 Simply wrap your app's root composable with `LensApp`. This will enable the LensLogger UI and log request/response in your app.
 
-### Example (Android Jetpack Compose)
-
-In your main UI (e.g., `MainActivity` or your root composable):
 
 ```kotlin
 import io.github.farhazulmullick.lenslogger.ui.LensApp
@@ -69,14 +71,6 @@ LensApp(modifier = Modifier.fillMaxSize()) {
 This will display your app content and allow you to open the LensLogger UI overlay for network log inspection.
 
 > **Note:** Make sure you have set up LensLogger with your Ktor client as shown above in your network module.
-
-## Artifact
-
-Add to your `libs.versions.toml`:
-```toml
-lensVersion = "0.0.1-alpha01"
-lens-logger = { module = "io.github.farhazulmullick:lens-logger", version.ref = "lensVersion" }
-```
 
 ## License
 

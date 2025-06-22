@@ -26,12 +26,18 @@ private const val TAG = "LensApp"
 @Composable
 fun LensApp(
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit = {}
+    showLensFAB: Boolean = true,
+    content: @Composable () -> Unit = {},
 ) {
     var showContent by remember { mutableStateOf(false) }
 
     Box(modifier = modifier) {
-        LensFAB(modifier = Modifier.zIndex(Float.MAX_VALUE)){ showContent = !showContent }
+        // Lens FAB to show bottom sheet.
+        if (showLensFAB) {
+            LensFAB(modifier = Modifier.zIndex(Float.MAX_VALUE)) {
+                showContent = !showContent
+            }
+        }
         content()
     }
 

@@ -26,9 +26,11 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun App() {
-    LensApp(modifier = Modifier
-        .safeContentPadding()
-        .fillMaxSize()
+    LensApp(
+        modifier = Modifier
+            .safeContentPadding()
+            .fillMaxSize(),
+        showLensFAB = true
     ){
         AppContent()
     }

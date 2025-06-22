@@ -62,7 +62,11 @@ Simply wrap your app's root composable with `LensApp`. This will enable the Lens
 import io.github.farhazulmullick.lenslogger.ui.LensApp
 import androidx.compose.ui.Modifier
 
-LensApp(modifier = Modifier.fillMaxSize()) {
+LensApp(
+    modifier = Modifier.fillMaxSize(), 
+    // by default enabled, set to false to disable.
+    showLensFAB = true
+) {
     // Your app content goes here
     App()
 }

@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -259,7 +260,6 @@ fun ResponsePageUI(
                         content = {
                             SelectionContainer {
                                 Column (Modifier.fillMaxWidth()){
-                                    VSpacer(16.dp)
                                     it.headers?.forEach { entry ->
                                         Text(text = "${entry.key} : ${entry.value}",
                                             color = MaterialTheme.colorScheme.onSurface,
@@ -283,16 +283,14 @@ fun ResponsePageUI(
                         },
                         content = {
                             SelectionContainer {
-                                Column (Modifier.fillMaxWidth()){
-                                    VSpacer(16.dp)
-                                    Text(
-                                        modifier = Modifier.animateContentSize(), text = it.body ?: "No body found",
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                        fontFamily = FontFamily.Monospace,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        softWrap = false
-                                    )
-                                }
+                                Text(
+                                    modifier = Modifier.animateContentSize(),
+                                    text = it.body ?: "No body",
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    fontFamily = FontFamily.Monospace,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    softWrap = false
+                                )
                             }
                         }
                     )
@@ -338,7 +336,11 @@ fun ExpandableCard(
             )
         }
         AnimatedVisibility(isExpanded) {
-            content()
+            Row(modifier = Modifier
+                .horizontalScroll(rememberScrollState())
+                .fillMaxWidth()) {
+                content()
+            }
         }
     }
 }

@@ -12,9 +12,15 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.charset
 import io.ktor.http.content.OutgoingContent
 import io.ktor.http.contentType
+import io.ktor.util.copyToBoth
+import io.ktor.utils.io.ByteChannel
+import io.ktor.utils.io.ByteWriteChannel
 import io.ktor.utils.io.InternalAPI
 import io.ktor.utils.io.charsets.Charsets
 import io.ktor.utils.io.core.toByteArray
+import io.ktor.utils.io.writeFully
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
@@ -32,6 +38,47 @@ data class NetworkLogs(
     }
     val responseData = if (response is Resource.Success) response.data else null
 }
+
+@OptIn(InternalAPI::class)
+suspend fun HttpRequestBuilder.requestBody(): String? {
+    val content = this.body as OutgoingContent
+
+    val requestLog = StringBuilder()
+    val charset = content.contentType?.charset() ?: Charsets.UTF_8
+
+    val channel = ByteChannel()
+    content.observe(channel)
+    return withContext(Dispatchers.Default) {
+        try {
+            val text = channel.tryReadText(charset) ?: "No request body"
+            requestLog.appendLine(text)
+            Napier.d(tag = TAG) { "REQUEST_BODY: ${requestLog}" }
+        } catch (e: Exception) {
+            Napier.e(tag = TAG) { "Error reading request body: ${e.message}" }
+            requestLog.appendLine("[request body error: ${e.message}]")
+        }
+        requestLog.toString()
+    }
+}
+
+internal suspend fun OutgoingContent.observe(log: ByteWriteChannel) = when (this) {
+    is OutgoingContent.ByteArrayContent -> {
+        log.writeFully(bytes())
+        log.flushAndClose()
+    }
+    is OutgoingContent.ReadChannelContent -> {
+        val responseChannel = ByteChannel()
+        val content = readFrom()
+
+        content.copyToBoth(log, responseChannel)
+    }
+    is OutgoingContent.NoContent, is OutgoingContent.ProtocolUpgrade -> {
+        log.flushAndClose()
+    }
+
+    else -> {log.flushAndClose()}
+}
+
 
 fun HttpRequestBuilder.contentLength(): String? {
     val data = this.headers[HttpHeaders.ContentLength]?.toIntOrNull()?.formatDataPacket()

@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,22 +51,20 @@ fun LensApp(
 internal fun LensContent(){
     val navController = rememberNavController()
     Scaffold(modifier = Modifier.fillMaxSize()) {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            NavHost(
-                startDestination = LensRoute.NetLogScreen,
-                navController = navController
-            ) {
-                composable<LensRoute.NetLogScreen> {
-                    NetLoggingScreen() {
-                        // navigate to details screen.
-                        navController.navigate(LensRoute.NetLogInfoScreen(index = it))
-                    }
+        NavHost(
+            startDestination = LensRoute.NetLogScreen,
+            navController = navController
+        ) {
+            composable<LensRoute.NetLogScreen> {
+                NetLoggingScreen() {
+                    // navigate to details screen.
+                    navController.navigate(LensRoute.NetLogInfoScreen(index = it))
                 }
-                composable<LensRoute.NetLogInfoScreen> {entry ->
-                    val data: LensRoute.NetLogInfoScreen = entry.toRoute<LensRoute.NetLogInfoScreen>()
-                    NetLoggingInfoScreen(index = data.index) {
-                        navController.navigateUp()
-                    }
+            }
+            composable<LensRoute.NetLogInfoScreen> {entry ->
+                val data: LensRoute.NetLogInfoScreen = entry.toRoute<LensRoute.NetLogInfoScreen>()
+                NetLoggingInfoScreen(index = data.index) {
+                    navController.navigateUp()
                 }
             }
         }

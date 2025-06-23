@@ -50,6 +50,7 @@ import io.github.aakira.napier.Napier
 import io.github.farhazulmullick.lenslogger.generateCurl
 import io.github.farhazulmullick.lenslogger.modal.NetworkLogs
 import io.github.farhazulmullick.lenslogger.modal.Resource
+import io.github.farhazulmullick.lenslogger.modal.requestBody
 import io.github.farhazulmullick.lenslogger.plugin.network.LensKtorStateManager
 import io.ktor.utils.io.InternalAPI
 import kotlinx.coroutines.launch
@@ -407,6 +408,34 @@ fun RequestPageUI(
                                 )
                             }
                         }
+                    }
+                }
+            )
+
+            // request header
+            // space
+            var isRequestBodyExpanded by remember { mutableStateOf(true) }
+            var requestBody by remember { mutableStateOf<String?>(null) }
+            LaunchedEffect(Unit) {
+                requestBody = it.requestBody()
+            }
+            VSpacer(12.dp)
+            ExpandableCard(
+                title = "Body",
+                isExpanded = isRequestBodyExpanded,
+                onClick = {
+                    isRequestBodyExpanded = !isRequestBodyExpanded
+                },
+                content = {
+                    SelectionContainer {
+                        Text(
+                            modifier = Modifier.animateContentSize(),
+                            text = requestBody ?: "No body",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontFamily = FontFamily.Monospace,
+                            style = MaterialTheme.typography.bodyMedium,
+                            softWrap = false
+                        )
                     }
                 }
             )

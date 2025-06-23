@@ -84,7 +84,7 @@ fun NetLoggingInfoScreen(
                     Text(
                         text = "${netLogs?.responseData?.status?.toString()}",
                         color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.titleLarge.copy(fontFamily = FontFamily.Monospace),
+                        style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Monospace),
                     )
                 }
                 VSpacer(4.dp)
@@ -115,7 +115,9 @@ fun NetLoggingInfoScreen(
             val pagerState = rememberPagerState() { 2 }
             val scope = rememberCoroutineScope()
             var selectedTab by remember { mutableStateOf(TAB.Request) }
-            Row(modifier = Modifier.fillMaxWidth()) {
+            Row(modifier = Modifier
+                .padding(horizontal = 56.dp)
+                .fillMaxWidth()) {
                 TAB.entries.forEach { it ->
                     BoxTab(
                         modifier = Modifier
@@ -171,14 +173,14 @@ fun BoxTab(
         modifier = Modifier
             .clip(RoundedCornerShape(100))
             .background(
-                color = if (isSelected) MaterialTheme.colorScheme.primary
+                color = if (isSelected) MaterialTheme.colorScheme.secondary
                 else MaterialTheme.colorScheme.surface
             )
-            .padding(4.dp)
             .then(modifier)
+            .padding(4.dp)
     ) {
         Text(tabTitle, modifier = Modifier,
-            color = if (isSelected) MaterialTheme.colorScheme.onPrimary
+            color = if (isSelected) MaterialTheme.colorScheme.onSecondary
             else MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.titleMedium.copy(
                 fontFamily = FontFamily.Monospace,

@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.outlined.NetworkCheck
@@ -28,6 +30,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import io.github.farhazulmullick.lenslogger.modal.NetworkLogs
@@ -50,17 +53,21 @@ fun NetLoggingScreen(
 
     LazyColumn(
         reverseLayout = true,
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.surfaceContainer),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
+        contentPadding = PaddingValues(8.dp),
         state = listState
     ) {
         itemsIndexed (logs) {index, item ->
             NetLogCard(
                 modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
                     .clickable { onItemClick(index) }
-                    .background(MaterialTheme.colorScheme.surfaceContainer)
-                    .padding(8.dp),
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(8.dp)
+                ,
                 netLog = item
             )
         }

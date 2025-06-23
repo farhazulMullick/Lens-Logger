@@ -19,12 +19,12 @@ Add the LensLogger artifact to your module's commonMain dependencies:
 
 ```kotlin
 dependencies {
-    implementation("io.github.farhazulmullick:lens-logger:0.0.1-alpha01")
+    implementation("io.github.farhazulmullick:lens-logger:0.0.1-alpha02")
 }
 ```
 Or add to your `libs.versions.toml`:
 ```toml
-lensVersion = "0.0.1-alpha01"
+lensVersion = "0.0.1-alpha02"
 lens-logger = { module = "io.github.farhazulmullick:lens-logger", version.ref = "lensVersion" }
 ```
 

@@ -9,6 +9,11 @@ LensLogger is a Kotlin Multiplatform (KMP) library for Android and iOS that make
 - 🖥️ Built-in UI for real-time log inspection
 - 🛠️ Minimal setup and easy to use
 
+## Demo
+
+![Lens Logger Demo](assets/lens_logger_demo.gif)
+
+
 ## Installation
 
 Add the LensLogger artifact to your module's commonMain dependencies:

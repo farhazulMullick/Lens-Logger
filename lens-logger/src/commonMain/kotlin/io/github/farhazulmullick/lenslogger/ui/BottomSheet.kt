@@ -1,6 +1,5 @@
 package io.github.farhazulmullick.lenslogger.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -19,11 +18,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.SheetState
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -50,10 +49,10 @@ internal fun LensBottomSheet(
     sheetElevation: Dp = 0.dp,
     sheetState: SheetState = rememberModalBottomSheetState(),
     scrimColor:Color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f),
-    backgroundColor: Color = MaterialTheme.colorScheme.background,
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     containerColor:Color = Color.Transparent,
     contentColor:Color = Color.Transparent,
-    showCross: Boolean = false,
+    showCross: Boolean = true,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val scope = rememberCoroutineScope()
@@ -96,7 +95,7 @@ internal fun LensBottomSheet(
                         .fillMaxWidth() then modifier,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     SheetHandle()
                     Spacer(modifier = Modifier.height(24.dp))
                     Box { content() }
@@ -118,12 +117,11 @@ private fun CrossButton(
     onDismiss: () -> Unit,
     backgroundColor: Color,
 ) {
-    lightColorScheme()
     val coroutineScope = rememberCoroutineScope()
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .size(32.dp)
+            .size(36.dp)
             .background(
                 shape = CircleShape,
                 color = backgroundColor
@@ -137,10 +135,10 @@ private fun CrossButton(
                 }
             }
     ) {
-        Image(
+        Icon(
             imageVector = Icons.Outlined.Close,
             contentDescription = null,
-            modifier = Modifier,
+            tint = MaterialTheme.colorScheme.onBackground
         )
     }
 }

@@ -1,9 +1,11 @@
 package io.github.farhazulmullick
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -28,6 +30,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun App() {
     LensApp(
         modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.surface)
             .safeContentPadding()
             .fillMaxSize(),
         showLensFAB = true

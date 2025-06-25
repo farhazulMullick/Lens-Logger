@@ -1,9 +1,13 @@
 package io.github.farhazulmullick.lenslogger.ui
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,20 +33,23 @@ fun LensApp(
     content: @Composable () -> Unit = {},
 ) {
     var showContent by remember { mutableStateOf(false) }
-
-    Box(modifier = modifier) {
-        // Lens FAB to show bottom sheet.
-        if (showLensFAB) {
-            LensFAB(modifier = Modifier.zIndex(Float.MAX_VALUE)) {
-                showContent = !showContent
+    MaterialTheme(
+        colorScheme = if(isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
+    ) {
+        Box(modifier = modifier) {
+            // Lens FAB to show bottom sheet.
+            if (showLensFAB) {
+                LensFAB(modifier = Modifier.zIndex(Float.MAX_VALUE)) {
+                    showContent = !showContent
+                }
             }
+            content()
         }
-        content()
-    }
 
-    if (showContent){
-        LensBottomSheet(onDismiss = { showContent = !showContent }) {
-            LensContent()
+        if (showContent){
+            LensBottomSheet(onDismiss = { showContent = !showContent }) {
+                LensContent()
+            }
         }
     }
 }

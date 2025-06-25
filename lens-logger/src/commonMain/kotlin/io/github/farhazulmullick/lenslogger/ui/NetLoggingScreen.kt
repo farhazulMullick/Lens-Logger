@@ -1,5 +1,6 @@
 package io.github.farhazulmullick.lenslogger.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.farhazulmullick.lenslogger.modal.NetworkLogs
 import io.github.farhazulmullick.lenslogger.modal.Resource
@@ -39,6 +41,9 @@ import io.github.farhazulmullick.lenslogger.modal.contentLength
 import io.github.farhazulmullick.lenslogger.plugin.network.LensKtorStateManager
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.http.encodedPath
+import lens.lens_logger.generated.resources.Res
+import lens.lens_logger.generated.resources.logger_no_data
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun NetLoggingScreen(
@@ -60,6 +65,26 @@ fun NetLoggingScreen(
         contentPadding = PaddingValues(8.dp),
         state = listState
     ) {
+        item {
+            AnimatedVisibility(logs.isEmpty()) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    VSpacer(24.dp)
+                    Image(
+                        modifier = Modifier.size(150.dp),
+                        painter = painterResource(Res.drawable.logger_no_data), contentDescription = null
+                    )
+
+                    VSpacer(12.dp)
+                    Text(
+                        text = "No, Network Calls Found.",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
+
         itemsIndexed (logs) {index, item ->
             NetLogCard(
                 modifier = Modifier

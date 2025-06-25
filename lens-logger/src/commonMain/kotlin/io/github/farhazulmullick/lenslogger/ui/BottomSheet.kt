@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
@@ -22,7 +23,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -34,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import io.github.farhazulmullick.lenslogger.Platform
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 
@@ -87,18 +92,29 @@ internal fun LensBottomSheet(
 
                     Spacer(modifier = Modifier.height(10.dp))
                 }
-
-                Column(
-                    modifier = Modifier
-                        .clip(sheetShape)
-                        .background(backgroundColor)
-                        .fillMaxWidth() then modifier,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    SheetHandle()
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Box { content() }
+                Scaffold(
+                    snackbarHost = {
+                        SnackbarHost(Platform.snackBarState) {
+                            Snackbar(
+                                modifier = Modifier.padding(bottom = 100.dp),
+                                snackbarData = it
+                            )
+                        }
+                    },
+                    containerColor = Color.Transparent,
+                ) { paddingValues ->
+                    Column(
+                        modifier = Modifier
+                            .clip(sheetShape)
+                            .background(backgroundColor)
+                            .fillMaxWidth() then modifier,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        SheetHandle()
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Box { content() }
+                    }
                 }
             }
         },

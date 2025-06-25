@@ -11,7 +11,7 @@ LensLogger is a Kotlin Multiplatform (KMP) library for Android and iOS that make
 
 ## Demo
 
-<img src="assets/lens_logger_demo.gif" width="200" alt="Lens Logger Demo">
+<img src="assets/lens_logger_demo.gif" width="220" alt="Lens Logger Demo">
 
 ## Installation
 
@@ -19,13 +19,13 @@ Add the LensLogger artifact to your module's commonMain dependencies:
 
 ```kotlin
 dependencies {
-    implementation("io.github.farhazulmullick:lens-logger:0.0.1-alpha02")
+    implementation("io.github.farhazulmullick:lens-logger:<version>")
 }
 ```
 Or add to your `libs.versions.toml`:
 ```toml
-lensVersion = "0.0.1-alpha02"
-lens-logger = { module = "io.github.farhazulmullick:lens-logger", version.ref = "lensVersion" }
+lensLoggerVersion = "<version>"
+lens-logger = { module = "io.github.farhazulmullick:lens-logger", version.ref = "lensLoggerVersion" }
 ```
 
 ## Usage
@@ -55,6 +55,25 @@ val client = HttpClient(engine) {
         Napier.base(DebugAntilog()) 
     }
 }
+
+/******************* OR ********************/
+/** Install Logger after client is created **/
+
+val client = HttpClient(engine) {
+    // body 
+}
+
+client.config {
+    install(LensHttpLogger) {
+        level = LogLevel.ALL
+        logger = object : Logger {
+            override fun log(message: String) {
+                Napier.d(message = message)
+            }
+        }
+    }
+}
+
 ```
 
 ### 2. Setup LensApp UI

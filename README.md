@@ -64,13 +64,8 @@ val client = HttpClient(engine) {
 }
 
 client.config {
-    install(LensHttpLogger) {
+    install(LensHttpLogger){
         level = LogLevel.ALL
-        logger = object : Logger {
-            override fun log(message: String) {
-                Napier.d(message = message)
-            }
-        }
     }
 }
 

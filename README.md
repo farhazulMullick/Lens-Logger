@@ -11,7 +11,9 @@ LensLogger is a Kotlin Multiplatform (KMP) library for Android and iOS that make
 
 ## Demo
 
-<img src="assets/lens_logger_demo.gif" width="220" alt="Lens Logger Demo">
+| Android | iOS |
+|---------|-----|
+| <video src="assets/android_logger_demo.mp4" width="220"/> | <video src="assets/ios_logger_demo.mp4" width="220"/> |
 
 ## Installation
 

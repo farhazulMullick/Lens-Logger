@@ -20,7 +20,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.outlined.NetworkCheck
+import androidx.compose.material.icons.outlined.ElectricBolt
 import androidx.compose.material.icons.outlined.Upload
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -111,16 +111,17 @@ fun NetLogCard(
         verticalArrangement = Arrangement.Center,
     ) {
         // Top Row: Status Code and Time
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        Row(modifier = Modifier.fillMaxWidth()) {
             when(netLog.response) {
                 is Resource.Loading -> {
                     Text("In Progress...", style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Monospace))
                 }
                 else -> {
+                    // Status Code icon
                     netLog.responseData?.apply {
+                        StatusCodeIcon(status)
+                        // Status Code Text
+                        HSpacer(8.dp)
                         Text(
                             status.toString(),
                             style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Monospace),
@@ -133,7 +134,7 @@ fun NetLogCard(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Path
+        // Endpoint Path
         request?.url?.encodedPath?.let {
             Text(it, style = MaterialTheme.typography.bodyLarge
                 .copy(fontFamily = FontFamily.Monospace), color = MaterialTheme.colorScheme.onSurface)
@@ -149,28 +150,31 @@ fun NetLogCard(
             request?.let {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically) {
-                    // method
+                    // Http-method name
                     Text(it.method.value, style = MaterialTheme.typography.labelLarge
                         .copy(fontFamily = FontFamily.Monospace)
                     )
                     // uploaded data.
                     Icon(modifier = Modifier.alpha(0.5f), imageVector = Icons.Outlined.Upload, contentDescription = null)
                     Text(it.contentLength().toString(), style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace))
+
                     // downloaded data
                     Icon(modifier = Modifier.alpha(0.5f),  imageVector = Icons.Filled.Download, contentDescription = null)
                     Text(netLog.responseData?.contentLength.toString(), style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace))
                 }
             }
 
+            // Response Time
             Row (horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically){
-                Image(imageVector = Icons.Outlined.NetworkCheck,
+                Icon(
+                    imageVector = Icons.Outlined.ElectricBolt,
                     modifier = Modifier.alpha(0.5f)
                         .size(16.dp),
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
                 netLog.responseTime?.let {
-                    // time ago
                     Text(it.toString() + "ms",
                         style = MaterialTheme.typography.labelSmall
                         .copy(fontFamily = FontFamily.Monospace)

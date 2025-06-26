@@ -83,6 +83,8 @@ fun NetLoggingInfoScreen(
                         )
                     }
 
+                    StatusCodeIcon(netLogs?.responseData?.status)
+                    HSpacer(8.dp)
                     Text(
                         text = "${netLogs?.responseData?.status?.toString()}",
                         color = MaterialTheme.colorScheme.onBackground,

@@ -1,5 +1,6 @@
 package io.github.farhazulmullick.lenslogger.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,7 +20,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.outlined.NetworkCheck
+import androidx.compose.material.icons.outlined.ElectricBolt
 import androidx.compose.material.icons.outlined.Upload
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.farhazulmullick.lenslogger.modal.NetworkLogs
 import io.github.farhazulmullick.lenslogger.modal.Resource
@@ -39,6 +41,9 @@ import io.github.farhazulmullick.lenslogger.modal.contentLength
 import io.github.farhazulmullick.lenslogger.plugin.network.LensKtorStateManager
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.http.encodedPath
+import lens.lens_logger.generated.resources.Res
+import lens.lens_logger.generated.resources.logger_no_data
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun NetLoggingScreen(
@@ -60,6 +65,26 @@ fun NetLoggingScreen(
         contentPadding = PaddingValues(8.dp),
         state = listState
     ) {
+        item {
+            AnimatedVisibility(logs.isEmpty()) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    VSpacer(24.dp)
+                    Image(
+                        modifier = Modifier.size(150.dp),
+                        painter = painterResource(Res.drawable.logger_no_data), contentDescription = null
+                    )
+
+                    VSpacer(12.dp)
+                    Text(
+                        text = "No, Network Calls Found.",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
+
         itemsIndexed (logs) {index, item ->
             NetLogCard(
                 modifier = Modifier
@@ -86,16 +111,17 @@ fun NetLogCard(
         verticalArrangement = Arrangement.Center,
     ) {
         // Top Row: Status Code and Time
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        Row(modifier = Modifier.fillMaxWidth()) {
             when(netLog.response) {
                 is Resource.Loading -> {
                     Text("In Progress...", style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Monospace))
                 }
                 else -> {
+                    // Status Code icon
                     netLog.responseData?.apply {
+                        StatusCodeIcon(status)
+                        // Status Code Text
+                        HSpacer(8.dp)
                         Text(
                             status.toString(),
                             style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Monospace),
@@ -108,7 +134,7 @@ fun NetLogCard(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Path
+        // Endpoint Path
         request?.url?.encodedPath?.let {
             Text(it, style = MaterialTheme.typography.bodyLarge
                 .copy(fontFamily = FontFamily.Monospace), color = MaterialTheme.colorScheme.onSurface)
@@ -124,28 +150,31 @@ fun NetLogCard(
             request?.let {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically) {
-                    // method
+                    // Http-method name
                     Text(it.method.value, style = MaterialTheme.typography.labelLarge
                         .copy(fontFamily = FontFamily.Monospace)
                     )
                     // uploaded data.
                     Icon(modifier = Modifier.alpha(0.5f), imageVector = Icons.Outlined.Upload, contentDescription = null)
                     Text(it.contentLength().toString(), style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace))
+
                     // downloaded data
                     Icon(modifier = Modifier.alpha(0.5f),  imageVector = Icons.Filled.Download, contentDescription = null)
                     Text(netLog.responseData?.contentLength.toString(), style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace))
                 }
             }
 
+            // Response Time
             Row (horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically){
-                Image(imageVector = Icons.Outlined.NetworkCheck,
+                Icon(
+                    imageVector = Icons.Outlined.ElectricBolt,
                     modifier = Modifier.alpha(0.5f)
                         .size(16.dp),
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
                 netLog.responseTime?.let {
-                    // time ago
                     Text(it.toString() + "ms",
                         style = MaterialTheme.typography.labelSmall
                         .copy(fontFamily = FontFamily.Monospace)

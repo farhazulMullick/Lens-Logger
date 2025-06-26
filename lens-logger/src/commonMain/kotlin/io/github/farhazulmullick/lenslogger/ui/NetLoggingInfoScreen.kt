@@ -47,6 +47,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.aakira.napier.Napier
+import io.github.farhazulmullick.lenslogger.Platform
 import io.github.farhazulmullick.lenslogger.generateCurl
 import io.github.farhazulmullick.lenslogger.modal.NetworkLogs
 import io.github.farhazulmullick.lenslogger.modal.Resource
@@ -82,6 +83,8 @@ fun NetLoggingInfoScreen(
                         )
                     }
 
+                    StatusCodeIcon(netLogs?.responseData?.status)
+                    HSpacer(8.dp)
                     Text(
                         text = "${netLogs?.responseData?.status?.toString()}",
                         color = MaterialTheme.colorScheme.onBackground,
@@ -100,7 +103,10 @@ fun NetLoggingInfoScreen(
                     .padding(16.dp),
                 onClick = {
                     val curl = netLogs?.requestData?.generateCurl()
-                    curl ?.let { clipboard.setText(AnnotatedString(curl)) }
+                    curl ?.let {
+                        clipboard.setText(AnnotatedString(curl))
+                        Platform.showSnackBar("cURL copied to clipboard!")
+                    }
                     Napier.d(tag = TAG){"$TAG :: cURL :: ${netLogs?.requestData?.generateCurl()}"}
                 }
             ) {

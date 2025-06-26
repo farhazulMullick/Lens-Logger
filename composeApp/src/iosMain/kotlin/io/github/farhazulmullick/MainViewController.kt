@@ -1,5 +1,15 @@
 package io.github.farhazulmullick
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.window.ComposeUIViewController
 
-fun MainViewController() = ComposeUIViewController { App() }
+fun MainViewController() = ComposeUIViewController {
+    MaterialTheme(
+        colorScheme = if (androidx.compose.foundation.isSystemInDarkTheme())
+            androidx.compose.material3.darkColorScheme()
+        else
+            androidx.compose.material3.lightColorScheme()
+    ) {
+        App()
+    }
+}

@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 
 expect fun platform(): String
 
-object Platform {
+internal object Platform {
     val snackBarState by mutableStateOf(SnackbarHostState())
     private val scope = MainScope()
 

@@ -8,7 +8,7 @@ androidx-lifecycle = "2.8.0"
 composeMultiplatform = "1.8.1"
 kotlin = "2.1.21"
 kotlinStdlib = "2.1.21"
-lens = "1.0.0"
+lensLogger = "1.0.0"
 ktorVersion = "3.0.1"
 napierVersion = "2.6.1"
 jbNavigation = "2.9.0-alpha14"
@@ -32,7 +32,7 @@ ktor-client-android-engine = { module = "io.ktor:ktor-client-okhttp", version.re
 ktor-client-cio-engine = { module = "io.ktor:ktor-client-cio", version.ref = "ktorVersion" }
 ktor-client-ios-engine = { module = "io.ktor:ktor-client-ios", version.ref = "ktorVersion" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorVersion" }
-lens-module = { module = "io.github.farhazulmullick:lens-logger", version.ref = "lens" }
+lens-module = { module = "io.github.farhazulmullick:lens-logger", version.ref = "lensLogger" }
 napier = { module = "io.github.aakira:napier", version.ref = "napierVersion" }
 kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 

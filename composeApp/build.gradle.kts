@@ -122,7 +122,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "io.github.farhazulmullick.lenslogger"
-            packageVersion = libs.versions.lens.get()
+            packageVersion = libs.versions.lensLogger.get()
         }
     }
 }

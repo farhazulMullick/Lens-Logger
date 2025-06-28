@@ -12,7 +12,7 @@ mavenPublishing {
     coordinates(
         groupId = "io.github.farhazulmullick",
         artifactId = "lens-logger",
-        version = libs.versions.lens.get()
+        version = libs.versions.lensLogger.get()
     )
 
     pom {

@@ -42,8 +42,8 @@ fun LensFAB(
         val nudgeSizePx = with(LocalDensity.current) { nudgeSize.toPx() }
         val scope = rememberCoroutineScope()
 
-        val offsetX: Animatable<Float, AnimationVector1D> = remember { Animatable(0f) }
-        val offsetY: Animatable<Float, AnimationVector1D> = remember { Animatable(0f) }
+        val offsetX: Animatable<Float, AnimationVector1D> = remember { Animatable(maxWidthPx-nudgeSizePx) }
+        val offsetY: Animatable<Float, AnimationVector1D> = remember { Animatable(maxHeightPx/4-nudgeSizePx) }
 
         Box(
             contentAlignment = Alignment.Center,

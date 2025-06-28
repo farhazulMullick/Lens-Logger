@@ -16,8 +16,13 @@ mavenPublishing {
     )
 
     pom {
-        name.set("Lens Ktor")
-        description.set("A description of what my library does.")
+        name.set("Lens Logger")
+        description.set(
+            "LensLogger is a Kotlin Multiplatform (KMP) library for Android and iOS " +
+                "that makes debugging network requests effortless. " +
+                "It automatically logs all Ktor network requests and responses, " +
+                "and provides a built-in UI to inspect these logs directly in your app."
+        )
         inceptionYear.set("2025")
         url.set("https://github.com/farhazulMullick/Lens/")
         licenses {
@@ -35,9 +40,9 @@ mavenPublishing {
             }
         }
         scm {
-            url.set("https://github.com/farhazulMullick/Lens/")
-            connection.set("scm:git:git://github.com/farhazulMullick/Lens.git")
-            developerConnection.set("scm:git:ssh://git@github.com/farhazulMullick/Lens.git")
+            url.set("https://github.com/farhazulMullick/Lens-Logger/")
+            connection.set("scm:git:git://github.com/farhazulMullick/Lens-Logger.git")
+            developerConnection.set("scm:git:ssh://git@github.com/farhazulMullick/Lens-Logger.git")
         }
     }
 }
@@ -96,7 +101,7 @@ android {
         dataBinding = true
     }
 
-    compileSdk = 34
+    compileSdk = 35
     defaultConfig {
         minSdk = 23
     }

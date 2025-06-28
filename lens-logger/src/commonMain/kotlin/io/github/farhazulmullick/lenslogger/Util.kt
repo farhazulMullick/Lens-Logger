@@ -20,7 +20,7 @@ fun HttpRequestBuilder.generateCurl(): String {
         }
         is ByteArrayContent -> {
             // Save to a temp file or use a placeholder
-            "--data-binary @yourfile.bin" // Todo: Research here
+            "--data-binary ~Binary data"
         }
         is TextContent -> {
             "-d '${content.text}'"

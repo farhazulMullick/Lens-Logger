@@ -13,6 +13,7 @@ import io.ktor.http.charset
 import io.ktor.http.content.OutgoingContent
 import io.ktor.http.contentType
 import io.ktor.util.copyToBoth
+import io.ktor.util.date.GMTDate
 import io.ktor.utils.io.ByteChannel
 import io.ktor.utils.io.ByteWriteChannel
 import io.ktor.utils.io.InternalAPI
@@ -23,6 +24,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlin.time.Clock.System
+import kotlin.time.ExperimentalTime
 
 private const val TAG = "NetworkLogs"
 data class NetworkLogs(
@@ -109,8 +112,31 @@ suspend fun HttpResponse?.toResponseData(): ResponseData {
         headers = this?.headers?.entries()?.associate { it.key to it.value.joinToString() },
         body = prettyJson,
         request = this?.request,
+        requestTime = this?.requestTime,
+        responseTime = this?.responseTime,
         contentLength = (bodyAsText?.toByteArray(Charsets.UTF_8)?.size ?: 0).formatDataPacket()
     )
+}
+
+@OptIn(ExperimentalTime::class)
+fun ResponseData.getRequestedAgoTime(): String? {
+    val requestTimeMilli = this.requestTime?.timestamp ?: return null
+    val currentTimeMilli = System.now().toEpochMilliseconds()
+    val requestedAgoMilli = currentTimeMilli - requestTimeMilli
+
+    val seconds = requestedAgoMilli / 1000
+    val minutes = seconds / 60
+    val hours = minutes / 60
+    if (hours > 0) {
+        return "$hours hr"
+    }
+    else if (minutes % 60 > 0) {
+        return "${minutes % 60} min"
+    }
+    else if (seconds % 60 > 0) {
+        return "${seconds % 60} sec"
+    }
+    return null
 }
 
 fun Int.formatDataPacket(): String? = when {
@@ -124,5 +150,7 @@ data class ResponseData(
     val headers: Map<String, String>? = null,
     val body: String? = null,
     val request: HttpRequest? = null,
+    val requestTime: GMTDate? = null,
+    val responseTime: GMTDate? = null,
     val contentLength: String? = null,
 )

@@ -3,6 +3,8 @@ package io.github.farhazulmullick.lenslogger.ui
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.safeGesturesPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -20,8 +22,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import io.github.farhazulmullick.lenslogger.navigation.LensRoute
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 private const val TAG = "LensApp"
 
@@ -36,14 +36,20 @@ fun LensApp(
     MaterialTheme(
         colorScheme = if(isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
     ) {
-        Box(modifier = modifier) {
+        Box(
+            modifier = Modifier
+                .zIndex(Float.MAX_VALUE)
+                .fillMaxSize()
+                .safeGesturesPadding()
+                .safeContentPadding()
+                .then(modifier)
+        ) {
             // Lens FAB to show bottom sheet.
             if (showLensFAB) {
-                LensFAB(modifier = Modifier.zIndex(Float.MAX_VALUE)) {
+                LensFAB(modifier = Modifier) {
                     showContent = !showContent
                 }
             }
-            content()
         }
 
         if (showContent){
@@ -52,6 +58,7 @@ fun LensApp(
             }
         }
     }
+    content()
 }
 
 @Composable
@@ -77,17 +84,3 @@ internal fun LensContent(){
         }
     }
 }
-
-@Serializable
-data class Comment(
-    @SerialName("postId")
-    val postId: Int?,
-    @SerialName("id")
-    val id: Int?,
-    @SerialName("name")
-    val name: String?,
-    @SerialName("email")
-    val email: String?,
-    @SerialName("body")
-    val body: String?
-)

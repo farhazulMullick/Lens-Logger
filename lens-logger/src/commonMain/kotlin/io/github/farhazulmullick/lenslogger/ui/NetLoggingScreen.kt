@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.outlined.ElectricBolt
 import androidx.compose.material.icons.outlined.Upload
 import androidx.compose.material3.Icon
@@ -38,12 +39,14 @@ import androidx.compose.ui.unit.dp
 import io.github.farhazulmullick.lenslogger.modal.NetworkLogs
 import io.github.farhazulmullick.lenslogger.modal.Resource
 import io.github.farhazulmullick.lenslogger.modal.contentLength
+import io.github.farhazulmullick.lenslogger.modal.getRequestedAgoTime
 import io.github.farhazulmullick.lenslogger.plugin.network.LensKtorStateManager
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.http.encodedPath
 import lens.lens_logger.generated.resources.Res
 import lens.lens_logger.generated.resources.logger_no_data
 import org.jetbrains.compose.resources.painterResource
+import kotlin.time.ExperimentalTime
 
 @Composable
 fun NetLoggingScreen(
@@ -77,7 +80,7 @@ fun NetLoggingScreen(
                     VSpacer(12.dp)
                     Text(
                         text = "No, Network Calls Found.",
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleLarge.copy(fontFamily = FontFamily.Monospace),
                         color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center
                     )
@@ -99,6 +102,7 @@ fun NetLoggingScreen(
     }
 }
 
+@OptIn(ExperimentalTime::class)
 @Composable
 fun NetLogCard(
     modifier: Modifier = Modifier,
@@ -161,6 +165,12 @@ fun NetLogCard(
                     // downloaded data
                     Icon(modifier = Modifier.alpha(0.5f),  imageVector = Icons.Filled.Download, contentDescription = null)
                     Text(netLog.responseData?.contentLength.toString(), style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace))
+
+                    // Requested ago
+                    netLog.responseData?.getRequestedAgoTime() ?.let {
+                        Icon(modifier = Modifier.alpha(0.5f),  imageVector = Icons.Filled.History, contentDescription = null)
+                        Text("$it ago", style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace))
+                    }
                 }
             }
 

@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.vanniktech.publish)
+    alias(libs.plugins.composeHotReload)
 }
 
 mavenPublishing {
@@ -42,48 +43,37 @@ mavenPublishing {
 }
 
 kotlin {
-    val xcfName = "lensktorKit"
-
-    iosX64 {
-        binaries.framework {
-            baseName = xcfName
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach {
+        it.binaries.framework {
+            baseName = "lensktorKit"
         }
     }
-
-    iosArm64 {
-        binaries.framework {
-            baseName = xcfName
-        }
-    }
-
-    iosSimulatorArm64 {
-        binaries.framework {
-            baseName = xcfName
-        }
-    }
-
     sourceSets {
-        commonMain {
-            dependencies {
-                implementation(libs.kotlin.stdlib)
-                implementation(compose.material3)
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.ui)
-                implementation(compose.materialIconsExtended)
-                implementation(compose.components.resources)
-                implementation(compose.components.uiToolingPreview)
-                implementation(libs.androidx.lifecycle.viewmodel)
-                implementation(libs.androidx.lifecycle.runtimeCompose)
-                implementation(libs.androidx.navigation)
+        jvm("desktop")
+        val desktopMain by getting
+        commonMain.dependencies {
+            implementation(libs.kotlin.stdlib)
+            implementation(compose.material3)
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.ui)
+            implementation(compose.materialIconsExtended)
+            implementation(compose.components.resources)
+            implementation(compose.components.uiToolingPreview)
+            implementation(libs.androidx.lifecycle.viewmodel)
+            implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.androidx.navigation)
 
-                implementation(libs.ktor.client.core)
-                implementation(libs.ktor.client.logging)
-                implementation(libs.ktor.client.content.negotiation)
-                implementation(libs.ktor.client.serializer)
-                implementation(libs.ktor.json.serializer)
-                implementation(libs.napier)
-            }
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.logging)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.client.serializer)
+            implementation(libs.ktor.json.serializer)
+            implementation(libs.napier)
         }
 
         commonTest {
@@ -91,14 +81,10 @@ kotlin {
                 implementation(libs.kotlin.test)
             }
         }
+        androidMain.dependencies{}
+        iosMain.dependencies {}
+        desktopMain.dependencies {}
 
-        androidMain {
-            dependencies {}
-        }
-
-        iosMain {
-            dependencies {}
-        }
     }
 
 }

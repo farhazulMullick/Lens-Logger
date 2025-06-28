@@ -18,8 +18,13 @@ import androidx.compose.material.icons.outlined.NetworkCheck
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,11 +44,25 @@ fun LensFAB(
         val nudgeSize = 56.dp
         val maxWidthPx = with(LocalDensity.current) { maxWidth.toPx() }
         val maxHeightPx = with(LocalDensity.current) { maxHeight.toPx() }
+
+        var maxWidthPxState by remember { mutableStateOf(maxWidthPx) }
+        var maxHeightPxState by remember { mutableStateOf(maxHeightPx)}
+
         val nudgeSizePx = with(LocalDensity.current) { nudgeSize.toPx() }
         val scope = rememberCoroutineScope()
 
-        val offsetX: Animatable<Float, AnimationVector1D> = remember { Animatable(maxWidthPx-nudgeSizePx) }
-        val offsetY: Animatable<Float, AnimationVector1D> = remember { Animatable(maxHeightPx/4-nudgeSizePx) }
+        val offsetX: Animatable<Float, AnimationVector1D> by remember { derivedStateOf { Animatable(maxWidthPx-nudgeSizePx)} }
+        val offsetY: Animatable<Float, AnimationVector1D> by remember { derivedStateOf { Animatable(maxHeightPx / 3 - nudgeSizePx) } }
+
+        //println("LensFAB: maxWidthPx = $maxWidthPx, maxHeightPx = $maxHeightPx, nudgeSizePx = $nudgeSizePx")
+        LaunchedEffect(maxHeightPx, maxWidthPx) {
+            maxHeightPxState = maxHeightPx
+            maxWidthPxState = maxWidthPx
+            val targetX = if (offsetX.value < (maxWidthPx - nudgeSizePx) / 2) 0f else (maxWidthPx - nudgeSizePx)
+            scope.launch {
+                offsetX.animateTo(targetX, animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium))
+            }
+        }
 
         Box(
             contentAlignment = Alignment.Center,
@@ -57,8 +76,8 @@ fun LensFAB(
                     detectDragGestures(
                         onDrag = { change, dragAmount ->
                             change.consume()
-                            val newX = (offsetX.value + dragAmount.x).coerceIn(0f, maxWidthPx - nudgeSizePx)
-                            val newY = (offsetY.value + dragAmount.y).coerceIn(0f, maxHeightPx - nudgeSizePx)
+                            val newX = (offsetX.value + dragAmount.x).coerceIn(0f, maxWidthPxState - nudgeSizePx)
+                            val newY = (offsetY.value + dragAmount.y).coerceIn(0f, maxHeightPxState - nudgeSizePx)
                             scope.launch {
                                 offsetX.snapTo(newX)
                                 offsetY.snapTo(newY)
@@ -66,7 +85,8 @@ fun LensFAB(
                         },
                         onDragEnd = {
                             // Stick to nearest horizontal edge
-                            val targetX = if (offsetX.value < (maxWidthPx - nudgeSizePx) / 2) 0f else (maxWidthPx - nudgeSizePx)
+                            //println("LensFAB: onDragEnd maxWidthPx = $maxWidthPx, maxHeightPx = $maxHeightPx, nudgeSizePx = $nudgeSizePx")
+                            val targetX = if (offsetX.value < (maxWidthPxState - nudgeSizePx) / 2) 0f else (maxWidthPxState - nudgeSizePx)
                             scope.launch {
                                 offsetX.animateTo(targetX, animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium))
                             }

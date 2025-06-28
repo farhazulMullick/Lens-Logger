@@ -1,5 +1,7 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,6 +10,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.vanniktech.publish)
+    alias(libs.plugins.composeHotReload)
 }
 
 kotlin {
@@ -30,7 +33,9 @@ kotlin {
     }
     
     sourceSets {
-        
+        jvm("desktop")
+        val desktopMain by getting
+
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
@@ -68,6 +73,12 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+
+        desktopMain.dependencies {
+            implementation(compose.desktop.currentOs)
+            implementation(libs.kotlinx.coroutinesSwing)
+            implementation(libs.ktor.client.cio.engine)
+        }
     }
 }
 
@@ -101,5 +112,18 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+}
+
+
+compose.desktop {
+    application {
+        mainClass = "io.github.farhazulmullick.MainDesktopKt"
+
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "io.github.farhazulmullick.lenslogger"
+            packageVersion = libs.versions.lens.get()
+        }
+    }
 }
 

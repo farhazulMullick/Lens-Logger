@@ -77,7 +77,7 @@ fun NetLoggingScreen(
                     VSpacer(12.dp)
                     Text(
                         text = "No, Network Calls Found.",
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleLarge.copy(fontFamily = FontFamily.Monospace),
                         color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center
                     )

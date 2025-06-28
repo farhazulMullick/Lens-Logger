@@ -136,7 +136,7 @@ fun ResponseData.getRequestedAgoTime(): String? {
     else if (seconds % 60 > 0) {
         return "${seconds % 60} sec"
     }
-    return null
+    return "0 sec"
 }
 
 fun Int.formatDataPacket(): String? = when {

@@ -1,19 +1,18 @@
 package io.github.farhazulmullick
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import io.github.farhazulmullick.lenslogger.ui.Comment
 import io.github.farhazulmullick.lenslogger.ui.LensApp
+import io.github.farhazulmullick.modal.Comment
 import io.github.farhazulmullick.network.HttpKtorClient
 import io.ktor.client.request.request
 import io.ktor.client.request.setBody
@@ -28,13 +27,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun App() {
-    LensApp(
-        modifier = Modifier
-            .background(color = MaterialTheme.colorScheme.surface)
-            .safeContentPadding()
-            .fillMaxSize(),
-        showLensFAB = true
-    ){
+    LensApp(showLensFAB = true){
         AppContent()
     }
 }
@@ -53,11 +46,12 @@ fun AppContent() {
             }
         )
     }
-    Column(modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Button(onClick = {
-            scope.launch {
+    Scaffold() {
+        Column(modifier = Modifier.padding(it).fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Button(onClick = {
+                scope.launch {
 //                    val response = client.get(urlString = "https://jsonplaceholder.typicode.com/comments?postId=100")
 //                    val body = response.body<String>()
 //                    client.post(urlString = "https://jsonplaceholder.typicode.com/posts", block = {
@@ -72,21 +66,22 @@ fun AppContent() {
 //                            )
 //                        )
 //                    })
-                client.request {
-                    method = HttpMethod.Post
-                    contentType(io.ktor.http.ContentType.Application.Json)
-                    setBody(Comment(
-                        postId = 100,
-                        id = null,
-                        name = "Sample Name",
-                        email = "",
-                        body = "Sample Body"
-                    ))
-                    url { path("/posts") }
+                    client.request {
+                        method = HttpMethod.Post
+                        contentType(io.ktor.http.ContentType.Application.Json)
+                        setBody(Comment(
+                            postId = 100,
+                            id = null,
+                            name = "Sample Name",
+                            email = "",
+                            body = "Sample Body"
+                        ))
+                        url { path("/posts") }
+                    }
                 }
+            }) {
+                Text("Make request!")
             }
-        }) {
-            Text("Make request!")
         }
     }
 }

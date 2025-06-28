@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.composeCompiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.kotlinSerialization) apply false
+    alias(libs.plugins.composeHotReload) apply false
 }
 
 allprojects {
@@ -14,6 +15,5 @@ allprojects {
         mavenCentral()
         maven("https://jitpack.io")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        mavenLocal()
     }
 }

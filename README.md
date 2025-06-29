@@ -64,13 +64,10 @@ val client = HttpClient(engine) {
 }
 
 /******************* OR ********************/
-/** Install Logger after client is created **/
+/** Install only LensLogger **/
 
 val client = HttpClient(engine) {
     // body 
-}
-
-client.config {
     install(LensHttpLogger){
         level = LogLevel.ALL
     }

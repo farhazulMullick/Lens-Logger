@@ -4,8 +4,8 @@
 ![Platform](https://img.shields.io/badge/iOS-supported-lightgrey?logo=apple)
 ![Platform](https://img.shields.io/badge/Desktop-supported-blue?logo=windows)
 
-LensLogger is a Kotlin Multiplatform (KMP) library for Android, iOS and Desktop that makes debugging network 
-requests effortless. It automatically logs all Ktor network requests and responses, and provides a built-in UI to inspect these logs directly in your app. 
+LensLogger is a Kotlin Multiplatform (KMP) library for Android, iOS and Desktop that makes debugging network requests effortless.
+It automatically logs all Ktor network requests and responses, and provides a built-in UI to inspect these logs directly in your app. 
 This helps you quickly identify issues and monitor network activity during development.
 
 ## Features

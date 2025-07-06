@@ -79,6 +79,8 @@ kotlin {
             implementation(libs.ktor.client.serializer)
             implementation(libs.ktor.json.serializer)
             implementation(libs.napier)
+            implementation(libs.datastore.core)
+            implementation(libs.datastore.preferences)
         }
 
         commonTest {

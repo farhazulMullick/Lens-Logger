@@ -15,6 +15,7 @@ jbNavigation = "2.9.0-alpha14"
 vanniktech = "0.32.0"
 composeHotReload = "1.0.0-alpha11"
 kotlinx-coroutines = "1.10.2"
+datastoreVersion = "1.1.7"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -35,6 +36,8 @@ ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "k
 lens-module = { module = "io.github.farhazulmullick:lens-logger", version.ref = "lensLogger" }
 napier = { module = "io.github.aakira:napier", version.ref = "napierVersion" }
 kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+datastore-core = { module = "androidx.datastore:datastore", version.ref = "datastoreVersion" }
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastoreVersion" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

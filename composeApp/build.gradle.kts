@@ -65,6 +65,9 @@ kotlin {
 
             implementation("org.jetbrains.kotlin:kotlin-stdlib-common")
             implementation(libs.napier)
+
+            implementation(libs.datastore.core)
+            implementation(libs.datastore.preferences)
         }
 
         iosMain.dependencies {

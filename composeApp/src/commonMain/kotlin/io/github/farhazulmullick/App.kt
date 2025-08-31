@@ -11,6 +11,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import io.github.farhazulmullick.lenslogger.ui.LensApp
 import io.github.farhazulmullick.modal.Comment
 import io.github.farhazulmullick.network.HttpKtorClient
@@ -26,8 +28,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
-fun App() {
-    LensApp(showLensFAB = true){
+fun App(stores: List<DataStore<Preferences>>) {
+    LensApp(showLensFAB = true, dataStores = stores){
         AppContent()
     }
 }

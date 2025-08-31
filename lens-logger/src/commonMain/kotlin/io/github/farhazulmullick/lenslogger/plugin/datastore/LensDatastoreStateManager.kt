@@ -8,6 +8,7 @@ import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.firstOrNull
 
 sealed class EditAction {
+    object Idle: EditAction()
     object Staging  : EditAction()
     object Commited   : EditAction()
 }
@@ -37,22 +38,22 @@ internal object LensDatastoreStateManager {
     /**
      * Master DataStores List. It contains all dataStores.
      */
-    val allDataStores: SnapshotStateList<Pair<String, BaseDataStorePrefs>> = mutableStateListOf()
+    val allDataStores: SnapshotStateList<BaseDataStorePrefs> = mutableStateListOf()
 
     val currentDataStoreEntry: SnapshotStateList<StoreEntryItem> = mutableStateListOf()
 
-    fun addStore(fileName: String, dataStore: DataStore<Preferences>) {
-        allDataStores.add(fileName to BaseDataStorePrefs(dataStore))
+    suspend fun setDataStores(dataStore: List<DataStore<Preferences>>) {
+        if (allDataStores.isEmpty())
+        allDataStores.addAll(dataStore.map { BaseDataStorePrefs(it) })
+        allDataStores.loadAllEntries()
     }
 
-    suspend fun loadAllEntriesFromDataStore(index: Int) {
-        if (index !in allDataStores.indices) return
-        val prefs: BaseDataStorePrefs = allDataStores[index].second
+    suspend fun List<BaseDataStorePrefs>.loadAllEntries() = forEach {
+        it.loadEntriesFromPrefs()
+    }
 
-        // clear current list.
-        currentDataStoreEntry.clear()
-
-        prefs.getEntriesAsMap()?.forEach { entry ->
+    suspend fun BaseDataStorePrefs?.loadEntriesFromPrefs() {
+        this?.getEntriesAsMap()?.forEach { entry ->
 
             val dataType = when(entry.value) {
                 is Int -> DataType.INT
@@ -69,22 +70,46 @@ internal object LensDatastoreStateManager {
                 value = entry.value.toString(),
                 dataType = dataType,
                 editAction = EditAction.Commited,
-                dataStore = prefs
+                dataStore = this
             )
             currentDataStoreEntry.add(storeEntryItem)
         }
     }
-    suspend fun startEditingAt(index: Int) {
-        if ( index in currentDataStoreEntry.indices) {
-            if (currentDataStoreEntry.any { it.editAction != EditAction.Staging }) {
+
+    suspend fun startChangesAt(index: Int) {
+        if (index in currentDataStoreEntry.indices) {
+            if (currentDataStoreEntry.any { it.editAction == EditAction.Staging }) {
+                cancelChangesAt(index)
+            }
+            currentDataStoreEntry[index] = currentDataStoreEntry[index].copy(
+                editAction = EditAction.Staging
+            )
+        }
+    }
+
+    fun writingAt(index: Int, value: String) {
+        if (index in currentDataStoreEntry.indices) {
+            currentDataStoreEntry[index] = currentDataStoreEntry[index].copy(
+                value = value,
+                editAction = EditAction.Idle
+            )
+        }
+    }
+
+    suspend fun cancelChangesAt(index: Int){
+        if (index in currentDataStoreEntry.indices){
+            val storeEntry: StoreEntryItem = currentDataStoreEntry[index]
+            val prefs: BaseDataStorePrefs = storeEntry.dataStore
+            if (storeEntry.editAction == EditAction.Staging){
                 currentDataStoreEntry[index] = currentDataStoreEntry[index].copy(
-                    editAction = EditAction.Staging
+                    value = prefs.getStringNullable(key = storeEntry.key).firstOrNull(),
+                    editAction = EditAction.Idle
                 )
             }
         }
     }
 
-    suspend fun saveChanges(index: Int, someValue: String?) {
+    suspend fun saveChangesAt(index: Int, someValue: String?) {
         val value = someValue?.trim()
         if (index in currentDataStoreEntry.indices) {
             val storeEntry: StoreEntryItem = currentDataStoreEntry[index]

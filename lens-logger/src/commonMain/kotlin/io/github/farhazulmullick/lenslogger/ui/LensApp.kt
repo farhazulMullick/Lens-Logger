@@ -124,35 +124,28 @@ fun AppNavHost(
         startDestination = startDestination.route,
         navController = navController
     ) {
-        TabDestination.entries.forEach { destinations ->
-            composable(route = destinations.route) {
-                when(destinations) {
-                    TabDestination.Network -> {
-                        NetLoggingScreen() {
-                            // navigate to details screen.
-                            navController.navigate(LensRoute.NetLogInfoScreen(index = it))
-                        }
-                    }
-
-                    TabDestination.DataStore -> {
-                        AllDatastoreListingScreen(dataStores) {
-                        }
-                    }
-                }
+        composable(TabDestination.Network.route) {
+            NetLoggingScreen() {
+                // navigate to details screen.
+                navController.navigate(LensRoute.NetLogInfoScreen(index = it))
             }
+        }
 
-            composable<LensRoute.NetLogInfoScreen> { entry ->
-                val data: LensRoute.NetLogInfoScreen = entry.toRoute<LensRoute.NetLogInfoScreen>()
-                NetLoggingInfoScreen(index = data.index) {
-                    navController.navigateUp()
-                }
+        composable(TabDestination.DataStore.route) {
+            AllDatastoreListingScreen(dataStores) {}
+        }
+
+        composable<LensRoute.NetLogInfoScreen> { entry ->
+            val data: LensRoute.NetLogInfoScreen = entry.toRoute<LensRoute.NetLogInfoScreen>()
+            NetLoggingInfoScreen(index = data.index) {
+                navController.navigateUp()
             }
+        }
 
-            composable<LensRoute.DataStoreLogInfoScreen> { entry ->
-                val data: LensRoute.DataStoreLogInfoScreen = entry.toRoute()
-                DatastoreLoggingInfoScreen(index = data.index){
-                    navController.navigateUp()
-                }
+        composable<LensRoute.DataStoreLogInfoScreen> { entry ->
+            val data: LensRoute.DataStoreLogInfoScreen = entry.toRoute()
+            DatastoreLoggingInfoScreen(index = data.index){
+                navController.navigateUp()
             }
         }
     }

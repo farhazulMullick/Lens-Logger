@@ -19,7 +19,9 @@ data class StoreEntryItem (
     val dataType: DataType,
     val editAction: EditAction,
     val dataStore: BaseDataStorePrefs
-)
+){
+    val keyNameWithType by lazy { key.plus(" (").plus(dataType.name).plus(")") }
+}
 
 enum class DataType {
     INT,
@@ -38,14 +40,19 @@ internal object LensDatastoreStateManager {
     /**
      * Master DataStores List. It contains all dataStores.
      */
-    val allDataStores: SnapshotStateList<BaseDataStorePrefs> = mutableStateListOf()
-
-    val currentDataStoreEntry: SnapshotStateList<StoreEntryItem> = mutableStateListOf()
+    private val allDataStores: SnapshotStateList<BaseDataStorePrefs> by lazy { mutableStateListOf() }
+    val currentDataStoreEntry: SnapshotStateList<StoreEntryItem> by lazy { mutableStateListOf() }
 
     suspend fun setDataStores(dataStore: List<DataStore<Preferences>>) {
-        if (allDataStores.isEmpty())
-        allDataStores.addAll(dataStore.map { BaseDataStorePrefs(it) })
-        allDataStores.loadAllEntries()
+        if (allDataStores.isEmpty()){
+            allDataStores.addAll(dataStore.map { BaseDataStorePrefs(it) })
+            allDataStores.loadAllEntries()
+        }
+    }
+
+    fun clear() {
+        allDataStores.clear();
+        currentDataStoreEntry.clear()
     }
 
     suspend fun List<BaseDataStorePrefs>.loadAllEntries() = forEach {
@@ -118,25 +125,50 @@ internal object LensDatastoreStateManager {
 
             try {
                 when(dataType) {
-                    DataType.INT -> prefs.setInt(storeEntry.key, value?.toIntOrNull())
-                    DataType.LONG -> prefs.setLong(storeEntry.key, value?.toLongOrNull())
-                    DataType.FLOAT -> prefs.setFloat(storeEntry.key, value?.toFloatOrNull())
-                    DataType.DOUBLE -> prefs.setDouble(storeEntry.key, value?.toDoubleOrNull())
-                    DataType.BOOLEAN -> prefs.setBoolean(storeEntry.key, value?.toBooleanStrictOrNull())
+                    DataType.INT -> prefs.setInt(storeEntry.key, value?.toInt())
+                    DataType.LONG -> prefs.setLong(storeEntry.key, value?.toLong())
+                    DataType.FLOAT -> prefs.setFloat(storeEntry.key, value?.toFloat())
+                    DataType.DOUBLE -> prefs.setDouble(storeEntry.key, value?.toDouble())
+                    DataType.BOOLEAN -> prefs.setBoolean(storeEntry.key, value?.toBoolean())
                     DataType.STRING -> prefs.setString(storeEntry.key, value)
                     DataType.NONE -> {
                         throw IllegalArgumentException("Unknown DataType")
                     }
                 }
             } catch (e: Exception) {
-                Napier.w(throwable = e) { "Unknown dataType found please, create issue in github if this is valid dataType" }
+                Napier.w(throwable = e) { "Please Pass value of type $dataType. Cause ${e.cause}" }
+                e.printStackTrace()
             }
 
-
+            // Read latest value from the data-store.
             currentDataStoreEntry[index] = storeEntry.copy(
-                value = prefs.getStringNullable(key = storeEntry.key).firstOrNull(),
+                value = prefs.getValuesWithDataTypeFromPrefs(storeEntry.key, dataType),
                 editAction = EditAction.Commited
             )
+        }
+    }
+
+    suspend fun BaseDataStorePrefs.getValuesWithDataTypeFromPrefs(key: String, dataType: DataType): String? {
+        return when(dataType) {
+            DataType.INT -> {
+                getIntNullable(key = key).firstOrNull().toString()
+            }
+            DataType.LONG -> {
+                getLongNullable(key = key).firstOrNull().toString()
+            }
+            DataType.FLOAT -> {
+                getFloatNullable(key = key).firstOrNull().toString()
+            }
+            DataType.DOUBLE -> {
+                getDoubleNullable(key = key).firstOrNull().toString()
+            }
+            DataType.STRING -> {
+                getStringNullable(key = key).firstOrNull().toString()
+            }
+            DataType.BOOLEAN -> {
+                getBooleanNullable(key = key).firstOrNull().toString()
+            }
+            else -> null
         }
     }
 }

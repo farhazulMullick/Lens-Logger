@@ -28,7 +28,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
-fun App(stores: List<DataStore<Preferences>>) {
+fun App(stores: List<DataStore<Preferences>> ) {
     LensApp(showLensFAB = true, dataStores = stores){
         AppContent()
     }

@@ -15,7 +15,7 @@ fun main() = application {
             else
                 androidx.compose.material3.lightColorScheme()
         ) {
-            App()
+            //App()
         }
     }
 }

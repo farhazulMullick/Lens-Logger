@@ -6,7 +6,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import io.github.aakira.napier.Napier
 import io.github.farhazulmullick.lenslogger.AppSnackBar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.withContext
 
 sealed class EditAction {
     object Idle: EditAction()
@@ -117,7 +120,7 @@ internal object LensDatastoreStateManager {
         }
     }
 
-    suspend fun saveChangesAt(index: Int, someValue: String?) {
+    suspend fun saveChangesAt(index: Int, someValue: String?): Boolean {
         val value = someValue?.trim()
         var isSaved = true
         if (index in currentDataStoreEntry.indices) {
@@ -125,19 +128,27 @@ internal object LensDatastoreStateManager {
             val prefs: BaseDataStorePrefs = storeEntry.dataStore
             val dataType: DataType = storeEntry.dataType
 
+            // read value from store if content identical pre exit.
+            if (storeEntry.value == prefs.getValuesWithDataTypeFromPrefs(storeEntry.key, dataType))
+                return true
+
             try {
-                when(dataType) {
-                    DataType.INT -> prefs.setInt(storeEntry.key, value?.toInt())
-                    DataType.LONG -> prefs.setLong(storeEntry.key, value?.toLong())
-                    DataType.FLOAT -> prefs.setFloat(storeEntry.key, value?.toFloat())
-                    DataType.DOUBLE -> prefs.setDouble(storeEntry.key, value?.toDouble())
-                    DataType.BOOLEAN -> prefs.setBoolean(storeEntry.key, value?.toBooleanStrict())
-                    DataType.STRING -> prefs.setString(storeEntry.key, value)
-                    DataType.NONE -> {
-                        isSaved = !isSaved
-                        throw IllegalArgumentException("Unknown DataType")
+                withContext(Dispatchers.IO) {
+                    when(dataType) {
+                        DataType.INT -> prefs.setInt(storeEntry.key, value?.toInt())
+                        DataType.LONG -> prefs.setLong(storeEntry.key, value?.toLong())
+                        DataType.FLOAT -> prefs.setFloat(storeEntry.key, value?.toFloat())
+                        DataType.DOUBLE -> prefs.setDouble(storeEntry.key, value?.toDouble())
+                        DataType.BOOLEAN -> prefs.setBoolean(storeEntry.key, value?.toBooleanStrict())
+                        DataType.STRING -> prefs.setString(storeEntry.key, value)
+                        DataType.NONE -> {
+                            throw IllegalStateException("Unknown DataType")
+                        }
                     }
                 }
+            } catch (e: IllegalStateException){
+                isSaved = !isSaved
+                AppSnackBar.showSnackBar(message = "Unknown dataType of value: $value for key ${storeEntry.key} of type: $dataType")
             } catch (e: Exception) {
                 isSaved = !isSaved
                 Napier.w(throwable = e) { "Please Pass value of type $dataType. Cause ${e.cause}" }
@@ -152,29 +163,32 @@ internal object LensDatastoreStateManager {
             )
             if (isSaved) AppSnackBar.showSnackBar(message = "Updated value for key ${storeEntry.key}")
         }
+        return isSaved
     }
 
     suspend fun BaseDataStorePrefs.getValuesWithDataTypeFromPrefs(key: String, dataType: DataType): String? {
-        return when(dataType) {
-            DataType.INT -> {
-                getIntNullable(key = key).firstOrNull().toString()
+        return withContext(Dispatchers.IO){
+            when(dataType) {
+                DataType.INT -> {
+                    getIntNullable(key = key).firstOrNull().toString()
+                }
+                DataType.LONG -> {
+                    getLongNullable(key = key).firstOrNull().toString()
+                }
+                DataType.FLOAT -> {
+                    getFloatNullable(key = key).firstOrNull().toString()
+                }
+                DataType.DOUBLE -> {
+                    getDoubleNullable(key = key).firstOrNull().toString()
+                }
+                DataType.STRING -> {
+                    getStringNullable(key = key).firstOrNull().toString()
+                }
+                DataType.BOOLEAN -> {
+                    getBooleanNullable(key = key).firstOrNull().toString()
+                }
+                else -> null
             }
-            DataType.LONG -> {
-                getLongNullable(key = key).firstOrNull().toString()
-            }
-            DataType.FLOAT -> {
-                getFloatNullable(key = key).firstOrNull().toString()
-            }
-            DataType.DOUBLE -> {
-                getDoubleNullable(key = key).firstOrNull().toString()
-            }
-            DataType.STRING -> {
-                getStringNullable(key = key).firstOrNull().toString()
-            }
-            DataType.BOOLEAN -> {
-                getBooleanNullable(key = key).firstOrNull().toString()
-            }
-            else -> null
         }
     }
 }

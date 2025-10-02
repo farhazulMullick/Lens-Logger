@@ -26,7 +26,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -40,6 +39,7 @@ import io.github.farhazulmullick.lenslogger.LocalSnackBarHostState
 import io.github.farhazulmullick.lenslogger.navigation.LensRoute
 import io.github.farhazulmullick.lenslogger.navigation.TabDestination
 import io.github.farhazulmullick.lenslogger.showSnackBar
+import kotlinx.coroutines.flow.collectLatest
 
 private const val TAG = "LensApp"
 
@@ -90,7 +90,7 @@ internal fun LensContent(
     var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
     val snackBarHostState = remember { SnackbarHostState() }
     LaunchedEffect(Unit){
-        AppSnackBar.snackBarMsgFlow.collect { snackBarData ->
+        AppSnackBar.snackBarMsgFlow.collectLatest { snackBarData ->
             if (snackBarData.message.isNotEmpty()) {
                 // Show snackbar only if message is not empty
                 showSnackBar(
@@ -110,7 +110,6 @@ internal fun LensContent(
         snackbarHost = {
             androidx.compose.material3.SnackbarHost(
                 hostState = snackBarHostState,
-                modifier = Modifier.padding(bottom = 100.dp)
             )
         },
         modifier = Modifier.fillMaxSize(),

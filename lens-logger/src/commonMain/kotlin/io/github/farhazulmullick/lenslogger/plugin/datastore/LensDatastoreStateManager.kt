@@ -5,6 +5,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import io.github.aakira.napier.Napier
+import io.github.farhazulmullick.lenslogger.AppSnackBar
 import kotlinx.coroutines.flow.firstOrNull
 
 sealed class EditAction {
@@ -129,7 +130,7 @@ internal object LensDatastoreStateManager {
                     DataType.LONG -> prefs.setLong(storeEntry.key, value?.toLong())
                     DataType.FLOAT -> prefs.setFloat(storeEntry.key, value?.toFloat())
                     DataType.DOUBLE -> prefs.setDouble(storeEntry.key, value?.toDouble())
-                    DataType.BOOLEAN -> prefs.setBoolean(storeEntry.key, value?.toBoolean())
+                    DataType.BOOLEAN -> prefs.setBoolean(storeEntry.key, value?.toBooleanStrict())
                     DataType.STRING -> prefs.setString(storeEntry.key, value)
                     DataType.NONE -> {
                         throw IllegalArgumentException("Unknown DataType")
@@ -138,6 +139,7 @@ internal object LensDatastoreStateManager {
             } catch (e: Exception) {
                 Napier.w(throwable = e) { "Please Pass value of type $dataType. Cause ${e.cause}" }
                 e.printStackTrace()
+                AppSnackBar.showSnackBar(message = "Unsupported dataType of value: $value for key ${storeEntry.key}")
             }
 
             // Read latest value from the data-store.

@@ -28,12 +28,12 @@ internal object AppSnackBar {
 
     enum class SnackBarActionType {
         CROSS,
-        NONE;
+        DISMISS;
     }
     data class SnackBarData(
         val message: String,
         val duration: SnackbarDuration = SnackbarDuration.Short,
-        val snackBarActionType : SnackBarActionType = SnackBarActionType.NONE
+        val snackBarActionType : SnackBarActionType = SnackBarActionType.DISMISS
     )
 
     private val _snackBarMsgFlow = MutableSharedFlow<SnackBarData>()
@@ -47,7 +47,7 @@ internal object AppSnackBar {
     }
 
     @UiThread
-    fun showSnackBar(message: String, duration: SnackbarDuration = SnackbarDuration.Short,snackBarActionType:SnackBarActionType = SnackBarActionType.NONE) {
+    fun showSnackBar(message: String, duration: SnackbarDuration = SnackbarDuration.Short,snackBarActionType:SnackBarActionType = SnackBarActionType.DISMISS) {
         showSnackBar(snackBarData = SnackBarData(message, duration, snackBarActionType ))
     }
 }

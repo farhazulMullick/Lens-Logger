@@ -119,6 +119,7 @@ internal object LensDatastoreStateManager {
 
     suspend fun saveChangesAt(index: Int, someValue: String?) {
         val value = someValue?.trim()
+        var isSaved = true
         if (index in currentDataStoreEntry.indices) {
             val storeEntry: StoreEntryItem = currentDataStoreEntry[index]
             val prefs: BaseDataStorePrefs = storeEntry.dataStore
@@ -133,13 +134,15 @@ internal object LensDatastoreStateManager {
                     DataType.BOOLEAN -> prefs.setBoolean(storeEntry.key, value?.toBooleanStrict())
                     DataType.STRING -> prefs.setString(storeEntry.key, value)
                     DataType.NONE -> {
+                        isSaved = !isSaved
                         throw IllegalArgumentException("Unknown DataType")
                     }
                 }
             } catch (e: Exception) {
+                isSaved = !isSaved
                 Napier.w(throwable = e) { "Please Pass value of type $dataType. Cause ${e.cause}" }
                 e.printStackTrace()
-                AppSnackBar.showSnackBar(message = "Unsupported dataType of value: $value for key ${storeEntry.key}")
+                AppSnackBar.showSnackBar(message = "Unsupported dataType of value: $value for key ${storeEntry.key} of type: $dataType")
             }
 
             // Read latest value from the data-store.
@@ -147,6 +150,7 @@ internal object LensDatastoreStateManager {
                 value = prefs.getValuesWithDataTypeFromPrefs(storeEntry.key, dataType),
                 editAction = EditAction.Commited
             )
+            if (isSaved) AppSnackBar.showSnackBar(message = "Updated value for key ${storeEntry.key}")
         }
     }
 

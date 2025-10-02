@@ -19,9 +19,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -48,6 +53,7 @@ fun AllDatastoreListingScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 itemsIndexed(items = LensDatastoreStateManager.currentDataStoreEntry) { index , item ->
+                    var wasFocused by remember { mutableStateOf(false) }
                     Column (
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ){
@@ -57,6 +63,16 @@ fun AllDatastoreListingScreen(
                         ) {
                             Text(text = "${index.plus(1)}")
                             OutlinedTextField(
+                                modifier = Modifier.onFocusChanged {focusState ->
+                                    if (focusState.isFocused) wasFocused = true
+                                    if (!focusState.isFocused && wasFocused) {
+                                        // ✅ Action when focus is lost
+                                        scope.launch {
+                                            LensDatastoreStateManager.saveChangesAt(index, item.value)
+                                            wasFocused = false
+                                        }
+                                    }
+                                },
                                 value = item.value ?: null.toString(),
                                 onValueChange = { change ->
                                     LensDatastoreStateManager.writingAt(index = index, value = change)

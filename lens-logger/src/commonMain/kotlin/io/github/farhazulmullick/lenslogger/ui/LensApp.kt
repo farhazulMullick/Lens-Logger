@@ -10,11 +10,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +26,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -31,8 +35,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import io.github.farhazulmullick.lenslogger.AppSnackBar
+import io.github.farhazulmullick.lenslogger.LocalSnackBarHostState
 import io.github.farhazulmullick.lenslogger.navigation.LensRoute
 import io.github.farhazulmullick.lenslogger.navigation.TabDestination
+import io.github.farhazulmullick.lenslogger.showSnackBar
 
 private const val TAG = "LensApp"
 
@@ -81,7 +88,31 @@ internal fun LensContent(
     val navController: NavHostController = rememberNavController()
     val startDestination = TabDestination.Network
     var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
+    val snackBarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(Unit){
+        AppSnackBar.snackBarMsgFlow.collect { snackBarData ->
+            if (snackBarData.message.isNotEmpty()) {
+                // Show snackbar only if message is not empty
+                showSnackBar(
+                    message = snackBarData.message,
+                    duration = snackBarData.duration,
+                    snackBarHostState = snackBarHostState,
+                    scope = this,
+                    actionLabel = snackBarData.snackBarActionType.name
+                )
+            } else {
+                // Dismiss current snackbar
+                snackBarHostState.currentSnackbarData?.dismiss()
+            }
+        }
+    }
     Scaffold(
+        snackbarHost = {
+            androidx.compose.material3.SnackbarHost(
+                hostState = snackBarHostState,
+                modifier = Modifier.padding(bottom = 100.dp)
+            )
+        },
         modifier = Modifier.fillMaxSize(),
         topBar = {
             PrimaryTabRow(selectedTabIndex = selectedDestination) {
@@ -103,12 +134,15 @@ internal fun LensContent(
                 }
             }
         }) { contentPadding ->
-        AppNavHost(
-            modifier = Modifier.padding(contentPadding),
-            startDestination = startDestination,
-            navController = navController,
-            dataStores = dataStores
-        )
+        CompositionLocalProvider(
+            LocalSnackBarHostState provides snackBarHostState
+        ){ AppNavHost(
+                modifier = Modifier.padding(contentPadding),
+                startDestination = startDestination,
+                navController = navController,
+                dataStores = dataStores
+            )
+        }
     }
 }
 

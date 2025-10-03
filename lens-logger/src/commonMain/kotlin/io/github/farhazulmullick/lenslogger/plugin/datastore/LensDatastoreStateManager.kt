@@ -50,13 +50,9 @@ internal object LensDatastoreStateManager {
     suspend fun setDataStores(dataStore: List<DataStore<Preferences>>) {
         if (allDataStores.isEmpty()){
             allDataStores.addAll(dataStore.map { BaseDataStorePrefs(it) })
-            allDataStores.loadAllEntries()
         }
-    }
-
-    fun clear() {
-        allDataStores.clear();
         currentDataStoreEntry.clear()
+        allDataStores.loadAllEntries()
     }
 
     suspend fun List<BaseDataStorePrefs>.loadAllEntries() = forEach {

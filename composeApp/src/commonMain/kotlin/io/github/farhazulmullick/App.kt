@@ -70,17 +70,21 @@ fun AppContent() {
 //                            )
 //                        )
 //                    })
-                    client.request {
-                        method = HttpMethod.Post
-                        contentType(io.ktor.http.ContentType.Application.Json)
-                        setBody(Comment(
-                            postId = 100,
-                            id = null,
-                            name = "Sample Name",
-                            email = "",
-                            body = "Sample Body"
-                        ))
-                        url { path("/posts") }
+                    try {
+                        client.request {
+                            method = HttpMethod.Post
+                            contentType(io.ktor.http.ContentType.Application.Json)
+                            setBody(Comment(
+                                postId = 100,
+                                id = null,
+                                name = "Sample Name",
+                                email = "",
+                                body = "Sample Body"
+                            ))
+                            url { path("/posts") }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
                 }
             }) {

@@ -14,12 +14,14 @@ This helps you quickly identify issues and monitor network activity during devel
 - 🔍 Logs all network requests and responses
 - 🖥️ Built-in UI for real-time log inspection
 - 🛠️ Minimal setup and easy to use
+- ✨ DataStore Visualizer
 
 ## Demo
 
 | Android                                                                       | iOS                                                                       | Desktop (Windows)                                                            |
 |-------------------------------------------------------------------------------|---------------------------------------------------------------------------|------------------------------------------------------------------------------|
-| <img src="assets/android_logger_demo.gif" width="240" alt="Lens Logger Demo"> | <img src="assets/ios_logger_demo.gif" width="200" alt="Lens Logger Demo"> |<img src="assets/desktop_logger_demo.gif" width="500" alt="Lens Logger Demo"> 
+| <img src="assets/android_logger_demo.gif" width="240" alt="Lens Logger Demo"> | <img src="assets/ios_logger_demo.gif" width="200" alt="Lens Logger Demo"> |<img src="assets/desktop_logger_demo.gif" width="500" alt="Lens Logger Demo">
+| <img src="assets/datastore_demo.gif" width="240" alt="Lens Logger Demo">
 
 
 ## Installation
@@ -89,7 +91,9 @@ import androidx.compose.ui.Modifier
 LensApp(
     modifier = Modifier.fillMaxSize(), 
     // by default enabled, set to false to disable.
-    showLensFAB = true
+    showLensFAB = true,
+    // Optional: For DataStore Visualizer
+    dataStores = listOf(DataStores<Preferences>) 
 ) {
     // Your app content goes here
     App()

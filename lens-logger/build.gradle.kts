@@ -8,19 +8,11 @@ plugins {
     alias(libs.plugins.composeHotReload)
 }
 
-/**
- * <server>
- * 	<id>${server}</id>
- * 	<username>TVIlUn</username>
- * 	<password>3nkjCsw7Yo7pMc5O23mqFhcHnDVJlgycS</password>
- * </server>
- */
-
 mavenPublishing {
     coordinates(
         groupId = "io.github.farhazulmullick",
         artifactId = "lens-logger",
-        version = "1.0.1-alpha01"
+        version = "1.1.0-alpha01"
     )
 
     pom {

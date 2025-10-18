@@ -66,12 +66,12 @@ fun AllDatastoreListingScreen(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             VSpacer(24.dp)
                             Image(
-                                modifier = Modifier.size(130.dp),
+                                modifier = Modifier.size(100.dp),
                                 painter = painterResource(Res.drawable.no_data_prefs), contentDescription = null
                             )
                             VSpacer(12.dp)
                             Text(
-                                text = if(dataStores.isEmpty()) "No, store files found." else "No, data found.",
+                                text = if(dataStores.isEmpty()) "No, Datastore files found." else "No, data found.",
                                 style = MaterialTheme.typography.titleLarge.copy(fontFamily = FontFamily.Monospace),
                                 color = MaterialTheme.colorScheme.onSurface,
                                 textAlign = TextAlign.Center

@@ -37,6 +37,6 @@ fun MainViewController() = ComposeUIViewController {
         else
             androidx.compose.material3.lightColorScheme()
     ) {
-        App(dataStores)
+        App()
     }
 }

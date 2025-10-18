@@ -1,10 +1,13 @@
 package io.github.farhazulmullick.lenslogger.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
@@ -28,13 +31,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import io.github.farhazulmullick.lenslogger.plugin.datastore.DataType
 import io.github.farhazulmullick.lenslogger.plugin.datastore.LensDatastoreStateManager
 import kotlinx.coroutines.launch
+import lens.lens_logger.generated.resources.Res
+import lens.lens_logger.generated.resources.no_data_prefs
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun AllDatastoreListingScreen(
@@ -51,7 +59,26 @@ fun AllDatastoreListingScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                item {
+                    AnimatedVisibility(LensDatastoreStateManager.currentDataStoreEntry.isEmpty()) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            VSpacer(24.dp)
+                            Image(
+                                modifier = Modifier.size(130.dp),
+                                painter = painterResource(Res.drawable.no_data_prefs), contentDescription = null
+                            )
+                            VSpacer(12.dp)
+                            Text(
+                                text = if(dataStores.isEmpty()) "No, store files found." else "No, data found.",
+                                style = MaterialTheme.typography.titleLarge.copy(fontFamily = FontFamily.Monospace),
+                                color = MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
                 itemsIndexed(items = LensDatastoreStateManager.currentDataStoreEntry) { index , item ->
                     var wasFocused by remember { mutableStateOf(false) }
                     Column (

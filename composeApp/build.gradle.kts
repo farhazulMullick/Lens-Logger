@@ -42,6 +42,7 @@ kotlin {
             implementation(libs.ktor.client.android.engine)
         }
         commonMain.dependencies {
+            implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-rc13")
             implementation(projects.lensLogger) // Replace with your actual core library dependency
             //implementation(libs.lens.module)
             // compose

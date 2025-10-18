@@ -8,6 +8,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -30,8 +31,11 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
-fun App(stores: List<DataStore<Preferences>> ) {
+fun App(stores: List<DataStore<Preferences>> = emptyList() ) {
     LensApp(showLensFAB = true, dataStores = stores){
+        LaunchedEffect(Unit){
+            //BaseDataStorePrefs(stores[0]).setString("name", "Farhazul Mullick")
+        }
         AppContent()
     }
 }

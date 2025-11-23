@@ -11,12 +11,13 @@ import io.github.farhazulmullick.datastore.STORE_FILE_1
 import io.github.farhazulmullick.datastore.STORE_FILE_2
 import io.github.farhazulmullick.datastore.STORE_FILE_3
 import io.github.farhazulmullick.datastore.createDataStore
+import io.github.farhazulmullick.server.ProxyServer
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-
+        ProxyServer.start()
         val dataStores = listOf(
             createDataStore { filesDir.resolve(STORE_FILE_1).absolutePath },
             createDataStore { filesDir.resolve(STORE_FILE_2).absolutePath },

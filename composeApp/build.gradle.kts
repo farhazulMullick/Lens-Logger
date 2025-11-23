@@ -40,6 +40,8 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.android.engine)
+            implementation(libs.ktor.server.core.jvm)
+            implementation(libs.ktor.server.core.netty)
         }
         commonMain.dependencies {
             implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-rc13")
@@ -101,6 +103,8 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/INDEX.LIST"
+            excludes += "/META-INF/io.netty.versions.properties"
         }
     }
     buildTypes {

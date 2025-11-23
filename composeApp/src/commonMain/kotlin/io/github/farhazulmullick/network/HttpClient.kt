@@ -3,6 +3,7 @@ package io.github.farhazulmullick.network
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import io.github.farhazulmullick.lenslogger.plugin.network.LensHttpLogger
+import io.github.farhazulmullick.lenslogger.plugin.network.enableMocking
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.DefaultRequest
@@ -76,7 +77,7 @@ fun HttpKtorClient(
             LensHttpLogger {
                 loginConfigs()
             }.also { Napier.base(DebugAntilog()) }
-    }
+    }.enableMocking()
     return httpClient
 }
 

@@ -7,6 +7,7 @@ import io.github.farhazulmullick.lenslogger.plugin.network.LensKtorStateManager.
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.HttpClientCall
+import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.api.ClientHook
 import io.ktor.client.plugins.api.ClientPlugin
 import io.ktor.client.plugins.api.createClientPlugin
@@ -17,6 +18,7 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.LoggingConfig
 import io.ktor.client.plugins.observer.ResponseHandler
 import io.ktor.client.plugins.observer.ResponseObserver
+import io.ktor.client.plugins.plugin
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.HttpSendPipeline
 import io.ktor.client.statement.HttpReceivePipeline
@@ -24,6 +26,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.HttpResponseContainer
 import io.ktor.client.statement.HttpResponsePipeline
 import io.ktor.http.content.OutgoingContent
+import io.ktor.http.set
 import io.ktor.util.AttributeKey
 import io.ktor.util.pipeline.PipelineContext
 import io.ktor.utils.io.ByteReadChannel
@@ -189,6 +192,23 @@ fun HttpClientConfig<*>.LensHttpLogger(block: LoggingConfig.() -> Unit = {}) {
     install(LensHttpLogger, block)
     install(Logging, block)
 }
+
+fun HttpClient.enableMocking(): HttpClient {
+    this.plugin(HttpSend).intercept { req ->
+
+        //If request to be mocked
+        req.url.set(
+            scheme = "http",
+            host = "localHost",
+            port = 8090,
+            path = "/my-endpoint"
+        )
+
+        execute(req)
+    }
+    return this
+}
+
 
 /**
  * A hook that is triggered when the server sends a raw HTTP response.

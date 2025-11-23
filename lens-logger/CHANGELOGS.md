@@ -1,5 +1,11 @@
 # Changelog
 
+1.1.0-alpha01
+========================================
+- Updated dependencies.
+- Minor bug fixes.
+- Added DataStore Visualizer.
+
 
 1.0.0
 ========================================

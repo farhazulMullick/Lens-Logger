@@ -73,7 +73,7 @@ fun NetLoggingScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     VSpacer(24.dp)
                     Image(
-                        modifier = Modifier.size(150.dp),
+                        modifier = Modifier.size(100.dp),
                         painter = painterResource(Res.drawable.logger_no_data), contentDescription = null
                     )
 

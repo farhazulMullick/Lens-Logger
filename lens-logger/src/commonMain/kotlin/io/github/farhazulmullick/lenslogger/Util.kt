@@ -5,6 +5,10 @@ import io.ktor.content.TextContent
 import io.ktor.http.content.ByteArrayContent
 import io.ktor.http.content.OutgoingContent.NoContent
 
+val String.Companion.EMPTY : String by lazy { "" }
+
+val String?.value get() =  this ?: String.EMPTY
+
 fun HttpRequestBuilder.generateCurl(): String {
     val method = method.value
     val url = url.toString()

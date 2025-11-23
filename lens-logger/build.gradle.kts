@@ -12,7 +12,7 @@ mavenPublishing {
     coordinates(
         groupId = "io.github.farhazulmullick",
         artifactId = "lens-logger",
-        version = libs.versions.lensLogger.get()
+        version = "1.1.0"
     )
 
     pom {
@@ -79,6 +79,8 @@ kotlin {
             implementation(libs.ktor.client.serializer)
             implementation(libs.ktor.json.serializer)
             implementation(libs.napier)
+            implementation(libs.datastore.core)
+            implementation(libs.datastore.preferences)
         }
 
         commonTest {

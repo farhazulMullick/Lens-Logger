@@ -32,7 +32,8 @@ data class NetworkLogs(
     val logLevel: LogLevel? = null,
     val request: Resource<HttpRequestBuilder>? = Resource.Loading(),
     val response: Resource<ResponseData>? = Resource.Loading(),
-    val responseTime: Long? = null
+    val responseTime: Long? = null,
+    val isMocked: Boolean = false
 ) {
     val requestData = when (request) {
         is Resource.Success -> request.data

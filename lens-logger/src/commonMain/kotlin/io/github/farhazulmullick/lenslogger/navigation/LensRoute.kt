@@ -2,6 +2,7 @@ package io.github.farhazulmullick.lenslogger.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Storage
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.WifiFind
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -24,6 +25,17 @@ sealed class LensRoute {
 
     @Serializable
     data class DataStoreLogInfoScreen(val index: Int): LensRoute()
+
+    @Serializable
+    object MockListScreen: LensRoute()
+
+    /**
+     * @param sourceLogIndex index into [io.github.farhazulmullick.lenslogger.plugin.network.LensKtorStateManager.stateCalls]
+     *  used to prefill the editor when creating a new mock from a log entry. -1 if not applicable.
+     * @param ruleId existing [io.github.farhazulmullick.lenslogger.plugin.network.MockRule] id when editing; null when creating.
+     */
+    @Serializable
+    data class MockEditorScreen(val sourceLogIndex: Int = -1, val ruleId: String? = null): LensRoute()
 }
 
 
@@ -47,6 +59,7 @@ enum class TabDestination(
 ) {
     Network("network", "Network", Icons.Default.WifiFind, "Network Tab"),
     DataStore("datastore", "Datastore", Icons.Default.Storage, "Datastore Tab"),
+    Mocks("mocks", "Mocks", Icons.Default.SwapHoriz, "Mocks Tab"),
 }
 
 @OptIn(InternalSerializationApi::class, ExperimentalSerializationApi::class)

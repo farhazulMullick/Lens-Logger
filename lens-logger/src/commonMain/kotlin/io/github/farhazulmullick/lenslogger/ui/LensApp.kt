@@ -40,6 +40,7 @@ import io.github.farhazulmullick.lenslogger.AppSnackBar
 import io.github.farhazulmullick.lenslogger.LocalSnackBarHostState
 import io.github.farhazulmullick.lenslogger.navigation.LensRoute
 import io.github.farhazulmullick.lenslogger.navigation.TabDestination
+import io.github.farhazulmullick.lenslogger.plugin.network.LensMockingStateManager
 import io.github.farhazulmullick.lenslogger.showSnackBar
 import kotlinx.coroutines.flow.collectLatest
 
@@ -95,6 +96,9 @@ internal fun LensContent(
     val startDestination = TabDestination.Network
     var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
     val snackBarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(Unit) {
+        LensMockingStateManager.init()
+    }
     LaunchedEffect(Unit){
         AppSnackBar.snackBarMsgFlow.collectLatest { snackBarData ->
             if (snackBarData.message.isNotEmpty()) {
@@ -174,11 +178,24 @@ fun AppNavHost(
             AllDatastoreListingScreen(dataStores) {}
         }
 
+        composable(TabDestination.Mocks.route) {
+            MocksListingScreen(
+                onAddNew = { navController.navigate(LensRoute.MockEditorScreen()) },
+                onEdit = { ruleId ->
+                    navController.navigate(LensRoute.MockEditorScreen(ruleId = ruleId))
+                }
+            )
+        }
+
         composable<LensRoute.NetLogInfoScreen> { entry ->
             val data: LensRoute.NetLogInfoScreen = entry.toRoute<LensRoute.NetLogInfoScreen>()
-            NetLoggingInfoScreen(index = data.index) {
-                navController.navigateUp()
-            }
+            NetLoggingInfoScreen(
+                index = data.index,
+                onMockClick = { logIdx ->
+                    navController.navigate(LensRoute.MockEditorScreen(sourceLogIndex = logIdx))
+                },
+                onBackClick = { navController.navigateUp() }
+            )
         }
 
         composable<LensRoute.DataStoreLogInfoScreen> { entry ->
@@ -186,6 +203,15 @@ fun AppNavHost(
             DatastoreLoggingInfoScreen(index = data.index){
                 navController.navigateUp()
             }
+        }
+
+        composable<LensRoute.MockEditorScreen> { entry ->
+            val data: LensRoute.MockEditorScreen = entry.toRoute()
+            MockEditorScreen(
+                sourceLogIndex = data.sourceLogIndex.takeIf { it >= 0 },
+                ruleId = data.ruleId,
+                onDone = { navController.navigateUp() }
+            )
         }
     }
 }

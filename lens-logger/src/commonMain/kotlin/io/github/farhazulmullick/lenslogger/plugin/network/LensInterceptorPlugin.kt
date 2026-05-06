@@ -18,25 +18,36 @@ import io.ktor.client.plugins.logging.LoggingConfig
 import io.ktor.client.plugins.observer.ResponseHandler
 import io.ktor.client.plugins.observer.ResponseObserver
 import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.HttpResponseData
 import io.ktor.client.request.HttpSendPipeline
 import io.ktor.client.statement.HttpReceivePipeline
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.HttpResponseContainer
 import io.ktor.client.statement.HttpResponsePipeline
+import io.ktor.http.HeadersBuilder
+import io.ktor.http.HttpProtocolVersion
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.OutgoingContent
 import io.ktor.util.AttributeKey
+import io.ktor.util.date.GMTDate
 import io.ktor.util.pipeline.PipelineContext
+import io.ktor.util.pipeline.PipelinePhase
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.InternalAPI
 import io.ktor.utils.io.charsets.Charset
 import io.ktor.utils.io.charsets.Charsets
 import io.ktor.utils.io.core.readText
+import io.ktor.utils.io.core.toByteArray
 import io.ktor.utils.io.readRemaining
+import kotlinx.io.IOException
+import kotlinx.coroutines.delay
 
 
 internal val LensCallLoggingKey = AttributeKey<Int>("LensCallLoggingKey")
 internal val DisableLogging = AttributeKey<Unit>("LensDisableLogging")
 internal val CurrentTimeKey = AttributeKey<Long>("CurrentTimeKey")
+/** Marks a request as having been satisfied by a [MockRule] instead of the real network. */
+internal val LensIsMockedKey = AttributeKey<Boolean>("LensIsMockedKey")
 
 class LensConfig {
     internal var filters = mutableListOf<(HttpRequestBuilder) -> Boolean>()
@@ -137,6 +148,11 @@ public val LensHttpLogger: ClientPlugin<LoggingConfig> = createClientPlugin("Len
         }
     }
 
+    // Install mocking *before* the engine runs. We insert a custom phase right before
+    // [HttpSendPipeline.Engine] so the existing logging interceptors (which run in
+    // [HttpSendPipeline.Monitoring]) still fire, but the engine itself is bypassed.
+    installLensMocking(client)
+
     if (!level.body) return@createClientPlugin
 
     @OptIn(InternalAPI::class)
@@ -155,6 +171,72 @@ public val LensHttpLogger: ClientPlugin<LoggingConfig> = createClientPlugin("Len
     // observe response.
     ResponseObserver.install(ResponseObserver.prepare { onResponse(observer) }, client)
 }
+
+private val LensMockPhase = PipelinePhase("LensMockPhase")
+
+@OptIn(InternalAPI::class)
+private fun installLensMocking(client: HttpClient) {
+    LensMockingStateManager.ensureInitialized()
+    client.sendPipeline.insertPhaseBefore(HttpSendPipeline.Engine, LensMockPhase)
+    client.sendPipeline.intercept(LensMockPhase) {
+        val request: HttpRequestBuilder = context
+        val rule = LensMockingStateManager.findActive(
+            url = request.url.buildString(),
+            method = request.method.value
+        ) ?: return@intercept
+
+        request.attributes.put(LensIsMockedKey, true)
+        LensKtorStateManager.markMocked(request)
+
+        val mockStartMs = currentEpochMs()
+
+        if (rule.delayMs > 0) {
+            delay(rule.delayMs)
+        }
+
+        if (rule.simulateFailure) {
+            val failure = IOException(
+                "Lens mock: simulated failure for ${request.method.value} ${request.url.buildString()}"
+            )
+            LensKtorStateManager.logMockedFailure(request, failure)
+            throw failure
+        }
+
+        val responseHeaders = HeadersBuilder().apply {
+            rule.headers.forEach { (key, value) -> append(key, value) }
+        }.build()
+
+        val responseData = HttpResponseData(
+            statusCode = HttpStatusCode.fromValue(rule.statusCode),
+            requestTime = GMTDate(),
+            headers = responseHeaders,
+            version = HttpProtocolVersion.HTTP_1_1,
+            body = ByteReadChannel(rule.body.toByteArray()),
+            callContext = request.executionContext
+        )
+
+        val mockedCall = HttpClientCall(
+            client = client,
+            requestData = request.build(),
+            responseData = responseData
+        )
+
+        // The ResponseObserver-driven logging path only runs when LogLevel.body is true and is
+        // unreliable for synthesized calls, so we record the mocked response directly here.
+        LensKtorStateManager.logMockedResponse(
+            requestBuilder = request,
+            rule = rule,
+            responseTimeMs = currentEpochMs() - mockStartMs
+        )
+
+        // Skip the engine phase entirely - the response is fully synthesized.
+        subject = mockedCall
+        finish()
+    }
+}
+
+@OptIn(kotlin.time.ExperimentalTime::class)
+private fun currentEpochMs(): Long = kotlin.time.Clock.System.now().toEpochMilliseconds()
 
 
 /**

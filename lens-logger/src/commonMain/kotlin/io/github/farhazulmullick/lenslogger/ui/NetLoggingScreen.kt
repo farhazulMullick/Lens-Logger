@@ -36,6 +36,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.Surface
 import io.github.farhazulmullick.lenslogger.modal.NetworkLogs
 import io.github.farhazulmullick.lenslogger.modal.Resource
 import io.github.farhazulmullick.lenslogger.modal.contentLength
@@ -102,6 +103,22 @@ fun NetLoggingScreen(
     }
 }
 
+@Composable
+internal fun MockedBadge(modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(4.dp),
+        color = MaterialTheme.colorScheme.tertiary
+    ) {
+        Text(
+            text = "MOCK",
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+            color = MaterialTheme.colorScheme.onTertiary,
+            style = MaterialTheme.typography.labelSmall.copy(fontFamily = FontFamily.Monospace)
+        )
+    }
+}
+
 @OptIn(ExperimentalTime::class)
 @Composable
 fun NetLogCard(
@@ -115,7 +132,10 @@ fun NetLogCard(
         verticalArrangement = Arrangement.Center,
     ) {
         // Top Row: Status Code and Time
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             when(netLog.response) {
                 is Resource.Loading -> {
                     Text("In Progress...", style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Monospace))
@@ -133,6 +153,10 @@ fun NetLogCard(
                         )
                     }
                 }
+            }
+            if (netLog.isMocked) {
+                HSpacer(8.dp)
+                MockedBadge()
             }
         }
 

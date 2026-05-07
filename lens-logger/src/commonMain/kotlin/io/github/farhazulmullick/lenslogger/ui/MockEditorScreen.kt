@@ -38,6 +38,7 @@ import io.github.farhazulmullick.lenslogger.modal.NetworkLogs
 import io.github.farhazulmullick.lenslogger.plugin.network.LensKtorStateManager
 import io.github.farhazulmullick.lenslogger.plugin.network.LensMockingStateManager
 import io.github.farhazulmullick.lenslogger.plugin.network.MockRule
+import io.ktor.http.HttpHeaders
 
 private data class HeaderEntry(var key: String, var value: String)
 
@@ -86,7 +87,14 @@ fun MockEditorScreen(
         val src = existing?.headers
             ?: sourceLog?.responseData?.headers
             ?: emptyMap()
-        src.map { HeaderEntry(it.key, it.value) }
+        // Drop framing headers when seeding from a captured live response: a stale
+        // Content-Length / Transfer-Encoding from the real response will not match the
+        // mocked body and would cause the engine to throw "Content-Length mismatch".
+        // The plugin re-derives Content-Length from the actual mock body at runtime.
+        src.filterKeys { key ->
+            !key.equals(HttpHeaders.ContentLength, ignoreCase = true) &&
+                !key.equals(HttpHeaders.TransferEncoding, ignoreCase = true)
+        }.map { HeaderEntry(it.key, it.value) }
     }
 
     var url by remember { mutableStateOf(initialUrl) }

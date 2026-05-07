@@ -25,6 +25,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.HttpResponseContainer
 import io.ktor.client.statement.HttpResponsePipeline
 import io.ktor.http.HeadersBuilder
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpProtocolVersion
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.OutgoingContent
@@ -202,8 +203,19 @@ private fun installLensMocking(client: HttpClient) {
             throw failure
         }
 
+        val bodyBytes = rule.body.toByteArray()
+
+        // Strip framing headers from the user-supplied set: the rule's headers are typically
+        // seeded from a captured live response, so a stale Content-Length / Transfer-Encoding
+        // would cause the engine to throw IllegalStateException when the mocked body length
+        // differs from the original. Re-derive Content-Length from the actual body.
         val responseHeaders = HeadersBuilder().apply {
-            rule.headers.forEach { (key, value) -> append(key, value) }
+            rule.headers.forEach { (key, value) ->
+                if (key.equals(HttpHeaders.ContentLength, ignoreCase = true)) return@forEach
+                if (key.equals(HttpHeaders.TransferEncoding, ignoreCase = true)) return@forEach
+                append(key, value)
+            }
+            append(HttpHeaders.ContentLength, bodyBytes.size.toString())
         }.build()
 
         val responseData = HttpResponseData(
@@ -211,7 +223,7 @@ private fun installLensMocking(client: HttpClient) {
             requestTime = GMTDate(),
             headers = responseHeaders,
             version = HttpProtocolVersion.HTTP_1_1,
-            body = ByteReadChannel(rule.body.toByteArray()),
+            body = ByteReadChannel(bodyBytes),
             callContext = request.executionContext
         )
 

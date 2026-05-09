@@ -1,10 +1,10 @@
 package io.github.farhazulmullick.lenslogger.ui
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -19,15 +19,23 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ElectricBolt
 import androidx.compose.material.icons.outlined.Upload
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +45,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Surface
+import androidx.compose.material3.TextFieldDefaults
 import io.github.farhazulmullick.lenslogger.modal.NetworkLogs
 import io.github.farhazulmullick.lenslogger.modal.Resource
 import io.github.farhazulmullick.lenslogger.modal.contentLength
@@ -55,50 +64,122 @@ fun NetLoggingScreen(
 ) {
     val logs: SnapshotStateList<NetworkLogs> = LensKtorStateManager.stateCalls
     val listState = rememberLazyListState()
+    var searchQuery by remember { mutableStateOf("") }
+    val queryTrimmed = searchQuery.trim()
 
-    LaunchedEffect(Unit) {
-        if (logs.isNotEmpty()) listState.scrollToItem(logs.lastIndex)
+    val filteredLogs = logs.mapIndexed { index, log -> index to log }
+        .filter { (_, log) ->
+            if (queryTrimmed.isEmpty()) true
+            else log.requestData?.url?.encodedPath?.contains(queryTrimmed, ignoreCase = true) == true
+        }
+
+    LaunchedEffect(logs.size, queryTrimmed) {
+        if (logs.isNotEmpty() && queryTrimmed.isEmpty() && filteredLogs.isNotEmpty()) {
+            listState.scrollToItem(filteredLogs.lastIndex)
+        }
     }
 
-    LazyColumn(
-        reverseLayout = true,
-        modifier = Modifier.fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.surfaceContainer),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        contentPadding = PaddingValues(8.dp),
-        state = listState
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.surfaceContainer)
     ) {
-        item {
-            AnimatedVisibility(logs.isEmpty()) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    VSpacer(24.dp)
-                    Image(
-                        modifier = Modifier.size(100.dp),
-                        painter = painterResource(Res.drawable.logger_no_data), contentDescription = null
-                    )
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 8.dp),
+            placeholder = {
+                Text(
+                    "Search by endpoint",
+                    style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace)
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            trailingIcon = {
+                if (searchQuery.isNotEmpty()) {
+                    IconButton(onClick = { searchQuery = "" }) {
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = "Clear search",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            },
+            singleLine = true,
+            shape = RoundedCornerShape(12.dp),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            ),
+            textStyle = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace),
+        )
 
-                    VSpacer(12.dp)
+        when {
+            logs.isEmpty() -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Image(
+                            modifier = Modifier.size(100.dp),
+                            painter = painterResource(Res.drawable.logger_no_data),
+                            contentDescription = null
+                        )
+                        VSpacer(12.dp)
+                        Text(
+                            text = "No, Network Calls Found.",
+                            style = MaterialTheme.typography.titleLarge.copy(fontFamily = FontFamily.Monospace),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+            filteredLogs.isEmpty() -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
                     Text(
-                        text = "No, Network Calls Found.",
-                        style = MaterialTheme.typography.titleLarge.copy(fontFamily = FontFamily.Monospace),
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Center
+                        text = "No endpoints match \"$queryTrimmed\"",
+                        style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Monospace),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(24.dp)
                     )
                 }
             }
-        }
-
-        itemsIndexed (logs) {index, item ->
-            NetLogCard(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable { onItemClick(index) }
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(8.dp)
-                ,
-                netLog = item
-            )
+            else -> {
+                LazyColumn(
+                    reverseLayout = true,
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    contentPadding = PaddingValues(8.dp),
+                    state = listState
+                ) {
+                    itemsIndexed(filteredLogs) { _, (originalIndex, item) ->
+                        NetLogCard(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable { onItemClick(originalIndex) }
+                                .background(MaterialTheme.colorScheme.surface)
+                                .padding(8.dp),
+                            netLog = item
+                        )
+                    }
+                }
+            }
         }
     }
 }

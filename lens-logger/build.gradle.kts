@@ -12,7 +12,7 @@ mavenPublishing {
     coordinates(
         groupId = "io.github.farhazulmullick",
         artifactId = "lens-logger",
-        version = "1.1.0"
+        version = "1.2.0-SNAPSHOT"
     )
 
     pom {
@@ -60,9 +60,14 @@ kotlin {
     sourceSets {
         jvm("desktop")
         val desktopMain by getting
+        val jvmCommonMain by creating {
+            dependsOn(commonMain.get())
+        }
+        androidMain.get().dependsOn(jvmCommonMain)
+        desktopMain.dependsOn(jvmCommonMain)
         commonMain.dependencies {
             implementation(libs.kotlin.stdlib)
-            implementation(compose.material3)
+            implementation(libs.jetbrains.material3)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.ui)
@@ -88,9 +93,24 @@ kotlin {
                 implementation(libs.kotlin.test)
             }
         }
-        androidMain.dependencies{}
+        androidMain.dependencies {}
+
+        // Custom jvmCommonMain wiring prevents the default hierarchy template from applying, so
+        // the shared Apple source set is not created automatically. Define iosMain and attach all
+        // iOS targets so Native compilations see expect/actual pairs under src/iosMain.
+        val iosMain by creating {
+            dependsOn(commonMain.get())
+        }
+        val iosArm64Main by getting
+        val iosSimulatorArm64Main by getting
+        val iosX64Main by getting
+        listOf(iosArm64Main, iosSimulatorArm64Main, iosX64Main).forEach { it.dependsOn(iosMain) }
+
         iosMain.dependencies {}
         desktopMain.dependencies {}
+        jvmCommonMain.dependencies {
+            implementation(libs.okhttp)
+        }
 
     }
 

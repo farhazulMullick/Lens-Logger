@@ -6,11 +6,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -41,6 +44,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -49,6 +54,7 @@ import androidx.compose.material3.TextFieldDefaults
 import io.github.farhazulmullick.lenslogger.modal.NetworkLogs
 import io.github.farhazulmullick.lenslogger.modal.Resource
 import io.github.farhazulmullick.lenslogger.modal.contentLength
+import io.github.farhazulmullick.lenslogger.modal.formatResponseTimeHuman
 import io.github.farhazulmullick.lenslogger.modal.getRequestedAgoTime
 import io.github.farhazulmullick.lenslogger.plugin.network.LensKtorStateManager
 import io.ktor.client.request.HttpRequestBuilder
@@ -200,7 +206,53 @@ internal fun MockedBadge(modifier: Modifier = Modifier) {
     }
 }
 
-@OptIn(ExperimentalTime::class)
+@Composable
+internal fun HttpMethodBadge(
+    httpMethod: String,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(4.dp),
+        color = MaterialTheme.colorScheme.secondaryContainer,
+    ) {
+        Text(
+            text = httpMethod.uppercase(),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            style = MaterialTheme.typography.labelMedium.copy(fontFamily = FontFamily.Monospace),
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
+        )
+    }
+}
+
+@Composable
+private fun NetMetricInline(
+    icon: ImageVector,
+    label: String,
+    tint: Color,
+) {
+    Row(
+        modifier = Modifier.heightIn(min = 24.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Icon(
+            modifier = Modifier
+                .alpha(0.6f)
+                .size(16.dp),
+            imageVector = icon,
+            contentDescription = null,
+            tint = tint,
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace),
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+    }
+}
+
+@OptIn(ExperimentalTime::class, ExperimentalLayoutApi::class)
 @Composable
 fun NetLogCard(
     modifier: Modifier = Modifier,
@@ -251,48 +303,42 @@ fun NetLogCard(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            request?.let {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically) {
-                    // Http-method name
-                    Text(it.method.value, style = MaterialTheme.typography.labelLarge
-                        .copy(fontFamily = FontFamily.Monospace)
+        if (request != null || netLog.responseData != null || netLog.responseTime != null) {
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                request?.let { req ->
+                    HttpMethodBadge(req.method.value)
+                    NetMetricInline(
+                        icon = Icons.Outlined.Upload,
+                        label = req.contentLength() ?: "0 B",
+                        tint = MaterialTheme.colorScheme.onSurface,
                     )
-                    // uploaded data.
-                    Icon(modifier = Modifier.alpha(0.5f), imageVector = Icons.Outlined.Upload, contentDescription = null)
-                    Text(it.contentLength().toString(), style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace))
-
-                    // downloaded data
-                    Icon(modifier = Modifier.alpha(0.5f),  imageVector = Icons.Filled.Download, contentDescription = null)
-                    Text(netLog.responseData?.contentLength.toString(), style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace))
-
-                    // Requested ago
-                    netLog.responseData?.getRequestedAgoTime() ?.let {
-                        Icon(modifier = Modifier.alpha(0.5f),  imageVector = Icons.Filled.History, contentDescription = null)
-                        Text("$it ago", style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace))
-                    }
                 }
-            }
 
-            // Response Time
-            Row (horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically){
-                Icon(
-                    imageVector = Icons.Outlined.ElectricBolt,
-                    modifier = Modifier.alpha(0.5f)
-                        .size(16.dp),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-                netLog.responseTime?.let {
-                    Text(it.toString() + "ms",
-                        style = MaterialTheme.typography.labelSmall
-                        .copy(fontFamily = FontFamily.Monospace)
+                netLog.responseData?.contentLength?.let { received ->
+                    NetMetricInline(
+                        icon = Icons.Filled.Download,
+                        label = received,
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+
+                netLog.responseData?.getRequestedAgoTime()?.let { ago ->
+                    NetMetricInline(
+                        icon = Icons.Filled.History,
+                        label = "$ago ago",
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+
+                netLog.responseTime?.let { ms ->
+                    NetMetricInline(
+                        icon = Icons.Outlined.ElectricBolt,
+                        label = ms.formatResponseTimeHuman(),
+                        tint = MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }

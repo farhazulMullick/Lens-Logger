@@ -140,10 +140,41 @@ fun ResponseData.getRequestedAgoTime(): String? {
     return "0 sec"
 }
 
-fun Int.formatDataPacket(): String? = when {
-    this >= 1024f * 1024f -> "${this / (1024f * 1024f)} MB"
-    this >= 1024f -> "${(this / 1024f)} KB"
-    else -> "$this B"
+/**
+ * Formats byte counts for headers and response sizes: B, then KB, then MB (binary scale), up to two
+ * fractional digits with trailing zeros trimmed.
+ */
+fun Int.formatDataPacket(): String? = this.toLong().formatBytesHuman()
+
+fun Long.formatBytesHuman(): String {
+    return when {
+        this < 1024L -> "${this} B"
+        this < 1024L * 1024L -> formatUpToTwoDecimalBinaryUnit(this / 1024.0, "KB")
+        else -> formatUpToTwoDecimalBinaryUnit(this / (1024.0 * 1024.0), "MB")
+    }
+}
+
+private fun formatUpToTwoDecimalBinaryUnit(value: Double, unit: String): String {
+    val scaledLong = kotlin.math.round(value * 100.0).toLong()
+    val whole = scaledLong / 100
+    val frac = kotlin.math.abs(scaledLong % 100)
+    val body =
+        if (frac == 0L) whole.toString()
+        else "$whole.${frac.toString().padStart(2, '0').trimEnd('0')}"
+    return "$body $unit"
+}
+
+/**
+ * Displays network latency; values ≥ 1000 ms are shown as seconds (e.g. `1.54 s`).
+ */
+fun Long.formatResponseTimeHuman(): String {
+    if (this < 1000L) return "${this} ms"
+    val seconds = this / 1000.0
+    val scaledLong = kotlin.math.round(seconds * 100.0).toLong()
+    val whole = scaledLong / 100
+    val frac = kotlin.math.abs(scaledLong % 100)
+    return if (frac == 0L) "${whole} s"
+    else "${whole}.${frac.toString().padStart(2, '0').trimEnd('0')} s"
 }
 
 data class ResponseData(

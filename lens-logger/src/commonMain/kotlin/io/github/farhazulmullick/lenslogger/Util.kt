@@ -1,37 +1,21 @@
 package io.github.farhazulmullick.lenslogger
 
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.content.TextContent
-import io.ktor.http.content.ByteArrayContent
-import io.ktor.http.content.OutgoingContent.NoContent
+import io.github.farhazulmullick.lenslogger.modal.LensHttpRequestSnapshot
 
 val String.Companion.EMPTY : String by lazy { "" }
 
 val String?.value get() =  this ?: String.EMPTY
 
-fun HttpRequestBuilder.generateCurl(): String {
-    val method = method.value
-    val url = url.toString()
-    val headers = headers.entries().joinToString(" ") { (k, v) ->
-        v.joinToString(" ") { value -> "-H \"$k: $value\"" }
+fun LensHttpRequestSnapshot.generateCurl(): String {
+    val parts = mutableListOf<String>()
+    parts.add("curl")
+    parts.add("-X")
+    parts.add(method)
+    headers.forEach { (k, v) -> parts.add("-H \"$k: $v\"") }
+    if (!bodyText.isNullOrBlank()) {
+        val escaped = bodyText.replace("'", "'\\''")
+        parts.add("-d '$escaped'")
     }
-
-    val body = when (val content = body) {
-        is io.ktor.client.request.forms.FormDataContent -> {
-            content.formData.entries().joinToString(" ") { (key, value) ->
-                "-F \"$key=$value\""
-            }
-        }
-        is ByteArrayContent -> {
-            // Save to a temp file or use a placeholder
-            "--data-binary ~Binary data"
-        }
-        is TextContent -> {
-            "-d '${content.text}'"
-        }
-        is NoContent -> ""
-        else -> ""
-    }
-
-    return "curl -X $method $headers $body \"$url\""
+    parts.add("\"$url\"")
+    return parts.joinToString(" ")
 }

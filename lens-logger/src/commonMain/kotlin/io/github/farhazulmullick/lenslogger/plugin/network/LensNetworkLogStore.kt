@@ -2,6 +2,7 @@ package io.github.farhazulmullick.lenslogger.plugin.network
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import io.github.farhazulmullick.lenslogger.modal.LensHttpRequestSnapshot
 import io.github.farhazulmullick.lenslogger.modal.NetworkLogs
 import io.github.farhazulmullick.lenslogger.modal.Resource
 import io.github.farhazulmullick.lenslogger.modal.ResponseData
@@ -22,46 +23,48 @@ import kotlinx.serialization.json.JsonElement
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-object LensKtorStateManager {
-    val stateCalls : SnapshotStateList<NetworkLogs> = mutableStateListOf<NetworkLogs>()
+/**
+ * In-memory log of HTTP calls. Client adapters record [LensHttpRequestSnapshot] values and
+ * correlate completions with a [callId] (list index) returned from [beginCall].
+ *
+ * Adapters (Ktor plugin, OkHttp interceptor, future URLSession/Swift bridges) should be the only
+ * code that touches client-specific types; this store stays transport-agnostic.
+ *
+ * Publishing note: a later release may split `lens-core` (this model + store + mocks) from
+ * `lens-ktor` / `lens-okhttp` artifacts; callers should depend on the snapshot types here rather
+ * than on Ktor request builders.
+ */
+object LensNetworkLogStore {
+    val stateCalls: SnapshotStateList<NetworkLogs> = mutableStateListOf()
     val mutex: Mutex = Mutex()
-    private val TAG = "LensKtorStateManager"
 
     @OptIn(ExperimentalTime::class)
-    suspend fun logRequest(requestBuilder: HttpRequestBuilder) {
+    suspend fun beginCall(snapshot: LensHttpRequestSnapshot): Int {
         mutex.withLock {
-            requestBuilder.attributes.put(LensCallLoggingKey, stateCalls.size)
-            requestBuilder.attributes.put(CurrentTimeKey, Clock.System.now().toEpochMilliseconds())
-            val log = NetworkLogs(request = Resource.Success(requestBuilder))
-
+            val id = stateCalls.size
+            val startedAt = Clock.System.now().toEpochMilliseconds()
+            val log = NetworkLogs(
+                request = Resource.Success(snapshot),
+                requestStartEpochMs = startedAt,
+            )
             stateCalls.add(log)
+            return id
         }
     }
 
-    /**
-     * Marks the [NetworkLogs] entry corresponding to this in-flight [requestBuilder] as having
-     * been satisfied by a [MockRule]. Called from the mocking interceptor right after the rule
-     * is matched. Safe to call before [logResponse].
-     */
-    fun markMocked(requestBuilder: HttpRequestBuilder) {
-        val index = requestBuilder.attributes.getOrNull(LensCallLoggingKey) ?: return
-        if (index !in stateCalls.indices) return
-        stateCalls[index] = stateCalls[index].copy(isMocked = true)
+    fun markMocked(callId: Int) {
+        if (callId !in stateCalls.indices) return
+        stateCalls[callId] = stateCalls[callId].copy(isMocked = true)
     }
 
-    /**
-     * Records a synthesized success response for a mocked request directly from a [MockRule],
-     * without depending on the [io.ktor.client.plugins.observer.ResponseObserver] (which only
-     * runs when the configured [io.ktor.client.plugins.logging.LogLevel] includes a body).
-     */
     @OptIn(ExperimentalTime::class)
     fun logMockedResponse(
-        requestBuilder: HttpRequestBuilder,
+        callId: Int,
         rule: MockRule,
-        responseTimeMs: Long
+        responseTimeMs: Long,
     ) {
-        val index = requestBuilder.attributes.getOrNull(LensCallLoggingKey) ?: return
-        if (index !in stateCalls.indices) return
+        if (callId !in stateCalls.indices) return
+        val snapshot = stateCalls[callId].requestData ?: return
 
         val prettyBody = if (rule.body.isBlank()) {
             rule.body
@@ -82,45 +85,40 @@ object LensKtorStateManager {
             requestTime = null,
             responseTime = null,
             contentLength = rule.body.toByteArray(Charsets.UTF_8).size.formatDataPacket(),
-            sourceRequestUrl = requestBuilder.url.buildString(),
+            sourceRequestUrl = snapshot.url,
         )
 
-        stateCalls[index] = stateCalls[index].copy(
+        stateCalls[callId] = stateCalls[callId].copy(
             response = Resource.Success(responseData),
             responseTime = responseTimeMs,
-            isMocked = true
+            isMocked = true,
         )
     }
 
-    /**
-     * Records a synthesized failure response for a mocked request configured with
-     * [MockRule.simulateFailure].
-     */
-    fun logMockedFailure(requestBuilder: HttpRequestBuilder, cause: Throwable?) {
-        val index = requestBuilder.attributes.getOrNull(LensCallLoggingKey) ?: return
-        if (index !in stateCalls.indices) return
-        stateCalls[index] = stateCalls[index].copy(
-            response = Resource.Failed(stateCalls[index].responseData, cause),
-            isMocked = true
+    fun logMockedFailure(callId: Int, cause: Throwable?) {
+        if (callId !in stateCalls.indices) return
+        stateCalls[callId] = stateCalls[callId].copy(
+            response = Resource.Failed(stateCalls[callId].responseData, cause),
+            isMocked = true,
         )
     }
 
     @OptIn(ExperimentalTime::class, InternalAPI::class)
     suspend fun logResponse(response: HttpResponse) {
-        val index = response.request.attributes[LensCallLoggingKey]
-        val sendTime: Long = response.request.attributes[CurrentTimeKey]
+        val index = response.request.attributes.getOrNull(LensCallLoggingKey) ?: return
+        val sendTime = stateCalls.getOrNull(index)?.requestStartEpochMs ?: return
         val responseTime: Long = Clock.System.now().toEpochMilliseconds() - sendTime
         if (index >= stateCalls.size) return
 
-        val response : ResponseData = response.toResponseData()
+        val responseData: ResponseData = response.toResponseData()
         stateCalls[index] = stateCalls[index].copy(
-            response = Resource.Success(response),
-            responseTime = responseTime
+            response = Resource.Success(responseData),
+            responseTime = responseTime,
         )
     }
 
     fun logRequestException(request: HttpRequestBuilder, cause: Throwable?) {
-        val index = request.attributes[LensCallLoggingKey]
+        val index = request.attributes.getOrNull(LensCallLoggingKey) ?: return
         if (index >= stateCalls.size) return
 
         stateCalls[index] = stateCalls[index].copy(
@@ -130,7 +128,7 @@ object LensKtorStateManager {
     }
 
     fun logResponseException(request: HttpRequest, cause: Throwable?) {
-        val index = request.attributes[LensCallLoggingKey]
+        val index = request.attributes.getOrNull(LensCallLoggingKey) ?: return
         if (index >= stateCalls.size) return
 
         stateCalls[index] = stateCalls[index].copy(
@@ -138,18 +136,14 @@ object LensKtorStateManager {
         )
     }
 
-    /**
-     * Completes an in-flight call (e.g. OkHttp / Retrofit) with a captured success [ResponseData].
-     */
     fun completeCallWithSuccess(callIndex: Int, responseTimeMs: Long, data: ResponseData) {
         if (callIndex !in stateCalls.indices) return
         stateCalls[callIndex] = stateCalls[callIndex].copy(
             response = Resource.Success(data),
-            responseTime = responseTimeMs
+            responseTime = responseTimeMs,
         )
     }
 
-    /** Transport failed before a response line was produced (mirror of [logResponseException]). */
     fun completeCallWithResponseTransportFailure(callIndex: Int, cause: Throwable?) {
         if (callIndex !in stateCalls.indices) return
         stateCalls[callIndex] = stateCalls[callIndex].copy(
@@ -157,7 +151,6 @@ object LensKtorStateManager {
         )
     }
 
-    /** Request never reached the backend (mirror of [logRequestException]). */
     fun completeCallWithOutboundFailure(callIndex: Int, cause: Throwable?) {
         if (callIndex !in stateCalls.indices) return
         stateCalls[callIndex] = stateCalls[callIndex].copy(
@@ -168,3 +161,9 @@ object LensKtorStateManager {
 
     fun clear() = stateCalls.clear()
 }
+
+@Deprecated(
+    message = "Renamed to LensNetworkLogStore for a client-agnostic API.",
+    replaceWith = ReplaceWith("LensNetworkLogStore"),
+)
+typealias LensKtorStateManager = LensNetworkLogStore

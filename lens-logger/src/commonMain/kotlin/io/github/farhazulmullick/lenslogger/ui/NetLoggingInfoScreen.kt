@@ -52,8 +52,7 @@ import io.github.farhazulmullick.lenslogger.Platform
 import io.github.farhazulmullick.lenslogger.generateCurl
 import io.github.farhazulmullick.lenslogger.modal.NetworkLogs
 import io.github.farhazulmullick.lenslogger.modal.Resource
-import io.github.farhazulmullick.lenslogger.modal.requestBody
-import io.github.farhazulmullick.lenslogger.plugin.network.LensKtorStateManager
+import io.github.farhazulmullick.lenslogger.plugin.network.LensNetworkLogStore
 import io.ktor.utils.io.InternalAPI
 import kotlinx.coroutines.launch
 
@@ -69,7 +68,7 @@ fun NetLoggingInfoScreen(
     onMockClick: (Int) -> Unit = {},
     onBackClick: () -> Unit
 ) {
-    val netLogs: NetworkLogs? = LensKtorStateManager.stateCalls.getOrNull(index)
+    val netLogs: NetworkLogs? = LensNetworkLogStore.stateCalls.getOrNull(index)
     Scaffold (
         modifier = Modifier,
         topBar = {
@@ -264,8 +263,8 @@ fun ResponsePageUI(
                                     ),
                                 color = MaterialTheme.colorScheme.onSurface,
                             )
-                            Text(
-                                text = it.request?.url?.toString() ?: it.sourceRequestUrl ?: "",
+                    Text(
+                        text = it.request?.url?.toString() ?: it.sourceRequestUrl ?: "",
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontFamily = FontFamily.Monospace,
                                 style = MaterialTheme.typography.bodyMedium,
@@ -398,7 +397,7 @@ fun RequestPageUI(
                     )
                     SelectionContainer {
                         Text(
-                            text = it.url.toString(),
+                            text = it.url,
                             style = MaterialTheme.typography.bodyMedium.copy(
                                     fontFamily = FontFamily.Monospace
                                 ),
@@ -423,8 +422,8 @@ fun RequestPageUI(
                     SelectionContainer {
                         Column (Modifier.fillMaxWidth()){
                             VSpacer(16.dp)
-                            it.headers.entries().forEach { entry ->
-                                Text(text = "${entry.key} : ${entry.value}",
+                            it.headers.forEach { (key, value) ->
+                                Text(text = "$key : $value",
                                     color = MaterialTheme.colorScheme.onSurface,
                                     style = MaterialTheme.typography.bodyMedium.copy(
                                         fontFamily = FontFamily.Monospace,
@@ -436,14 +435,8 @@ fun RequestPageUI(
                 }
             )
 
-            // request header
-            // space
-            var isRequestBodyExpanded by remember { mutableStateOf(true) }
-            var requestBody by remember { mutableStateOf<String?>(null) }
-            LaunchedEffect(Unit) {
-                requestBody = it.requestBody()
-            }
             VSpacer(12.dp)
+            var isRequestBodyExpanded by remember { mutableStateOf(true) }
             ExpandableCard(
                 title = "Body",
                 isExpanded = isRequestBodyExpanded,
@@ -454,7 +447,7 @@ fun RequestPageUI(
                     SelectionContainer {
                         Text(
                             modifier = Modifier.animateContentSize(),
-                            text = requestBody ?: "No body",
+                            text = it.bodyText ?: "No body",
                             color = MaterialTheme.colorScheme.onSurface,
                             fontFamily = FontFamily.Monospace,
                             style = MaterialTheme.typography.bodyMedium,

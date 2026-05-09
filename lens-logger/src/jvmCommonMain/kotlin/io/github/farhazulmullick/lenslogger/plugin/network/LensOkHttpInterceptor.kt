@@ -1,14 +1,9 @@
 package io.github.farhazulmullick.lenslogger.plugin.network
 
+import io.github.farhazulmullick.lenslogger.modal.LensHttpRequestSnapshot
 import io.github.farhazulmullick.lenslogger.modal.ResponseData
 import io.github.farhazulmullick.lenslogger.modal.formatDataPacket
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.setBody
-import io.ktor.client.request.url as ktorUrl
-import io.ktor.http.ContentType
-import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.content.ByteArrayContent
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -36,7 +31,7 @@ internal data class PreparedOkHttpRequest(
 
 /**
  * Reads a one-shot request body once and returns a request with a replayable body plus the bytes
- * used for Ktor-style request logging.
+ * used for request logging.
  */
 internal fun prepareOkHttpRequest(original: Request): PreparedOkHttpRequest {
     val body = original.body ?: return PreparedOkHttpRequest(original, null, null)
@@ -50,31 +45,29 @@ internal fun prepareOkHttpRequest(original: Request): PreparedOkHttpRequest {
     return PreparedOkHttpRequest(replayable, bytes, contentType)
 }
 
-internal fun toLensHttpRequestBuilder(
-    prepared: PreparedOkHttpRequest,
-): HttpRequestBuilder {
-    val req = prepared.request
-    return HttpRequestBuilder().apply {
-        ktorUrl(req.url.toString())
-        method = HttpMethod(req.method)
-        for (i in 0 until req.headers.size) {
-            headers.append(req.headers.name(i), req.headers.value(i))
-        }
-        val rawBytes = prepared.bodyBytes
-        if (rawBytes != null) {
-            val ctString = prepared.bodyContentType?.toString()
-            val ct = ctString?.let { ContentType.parse(it) }
-            setBody(ByteArrayContent(rawBytes, contentType = ct))
-        }
-    }
-}
-
 private fun okhttpHeadersToSingleMap(headers: okhttp3.Headers): Map<String, String> {
     val out = LinkedHashMap<String, String>()
     for (i in 0 until headers.size) {
         out[headers.name(i)] = headers.value(i)
     }
     return out
+}
+
+private fun Request.toLensHttpRequestSnapshot(
+    bodyBytes: ByteArray?,
+): LensHttpRequestSnapshot {
+    val headerMap = okhttpHeadersToSingleMap(headers)
+    val bodyText = bodyBytes?.decodeToString()
+    val cl = bodyBytes?.size?.formatDataPacket()
+        ?: headers["Content-Length"]?.toIntOrNull()?.formatDataPacket()
+    return LensHttpRequestSnapshot(
+        method = method,
+        url = url.toString(),
+        encodedPath = url.encodedPath,
+        headers = headerMap,
+        bodyText = bodyText,
+        contentLengthDisplay = cl,
+    )
 }
 
 private fun prettyJsonBody(raw: String?): String? {
@@ -104,7 +97,7 @@ private fun fallbackHttpReason(code: Int): String = when (code) {
 }
 
 /**
- * Logs outbound calls into [LensKtorStateManager] and honors [LensMockingStateManager] (same URLs
+ * Logs outbound calls into [LensNetworkLogStore] and honors [LensMockingStateManager] (same URLs
  * and methods as Ktor uses). Install on the **application** interceptor list of your
  * Retrofit-bound [okhttp3.OkHttpClient].
  *
@@ -118,24 +111,22 @@ class LensOkHttpInterceptor : Interceptor {
 
         val prepared = prepareOkHttpRequest(chain.request())
         val request = prepared.request
-        val lensBuilder = toLensHttpRequestBuilder(prepared)
+        val snapshot = request.toLensHttpRequestSnapshot(prepared.bodyBytes)
 
         val callIndex = runBlocking {
-            LensKtorStateManager.logRequest(lensBuilder)
-            lensBuilder.attributes.getOrNull(LensCallLoggingKey)
-                ?: error("LensOkHttpInterceptor: missing call index after logRequest")
+            LensNetworkLogStore.beginCall(snapshot)
         }
 
         val mockRule = LensMockingStateManager.findActive(request.url.toString(), request.method)
         if (mockRule != null) {
-            return handleMock(request, lensBuilder, mockRule)
+            return handleMock(request, callIndex, mockRule)
         }
 
         val sendTime = System.currentTimeMillis()
         val response = try {
             chain.proceed(request)
         } catch (e: IOException) {
-            LensKtorStateManager.completeCallWithResponseTransportFailure(callIndex, e)
+            LensNetworkLogStore.completeCallWithResponseTransportFailure(callIndex, e)
             throw e
         }
         val elapsed = System.currentTimeMillis() - sendTime
@@ -143,12 +134,12 @@ class LensOkHttpInterceptor : Interceptor {
         val bodyString = try {
             val body = response.body ?: run {
                 val data = LensOkHttpCapturedResponse.responseDataWithoutBody(response, bodyLengthLabel = null)
-                LensKtorStateManager.completeCallWithSuccess(callIndex, elapsed, data)
+                LensNetworkLogStore.completeCallWithSuccess(callIndex, elapsed, data)
                 return response
             }
             response.peekBody(MAX_PEEK_BYTES).string()
         } catch (e: Throwable) {
-            LensKtorStateManager.completeCallWithResponseTransportFailure(callIndex, e)
+            LensNetworkLogStore.completeCallWithResponseTransportFailure(callIndex, e)
             throw e
         }
 
@@ -169,17 +160,17 @@ class LensOkHttpInterceptor : Interceptor {
                 ?: bodyString.encodeToByteArray().size.formatDataPacket(),
             sourceRequestUrl = request.url.toString(),
         )
-        LensKtorStateManager.completeCallWithSuccess(callIndex, elapsed, data)
+        LensNetworkLogStore.completeCallWithSuccess(callIndex, elapsed, data)
 
         return response
     }
 
     private fun handleMock(
         request: Request,
-        lensBuilder: HttpRequestBuilder,
+        callId: Int,
         rule: MockRule,
     ): Response {
-        LensKtorStateManager.markMocked(lensBuilder)
+        LensNetworkLogStore.markMocked(callId)
 
         val mockStart = System.currentTimeMillis()
         if (rule.delayMs > 0L) {
@@ -188,7 +179,7 @@ class LensOkHttpInterceptor : Interceptor {
         val urlDesc = "${request.method} ${request.url}"
         if (rule.simulateFailure) {
             val failure = IOException("Lens mock: simulated failure for $urlDesc")
-            LensKtorStateManager.logMockedFailure(lensBuilder, failure)
+            LensNetworkLogStore.logMockedFailure(callId, failure)
             throw failure
         }
 
@@ -207,7 +198,7 @@ class LensOkHttpInterceptor : Interceptor {
 
         val responseBody = bodyBytes.toResponseBody(mediaType)
         val took = System.currentTimeMillis() - mockStart
-        LensKtorStateManager.logMockedResponse(lensBuilder, rule, took)
+        LensNetworkLogStore.logMockedResponse(callId, rule, took)
 
         return Response.Builder()
             .request(request)

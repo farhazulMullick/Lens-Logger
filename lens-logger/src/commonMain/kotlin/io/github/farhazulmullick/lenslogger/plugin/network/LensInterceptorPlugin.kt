@@ -1,9 +1,9 @@
 package io.github.farhazulmullick.lenslogger.plugin.network
 
-import io.github.farhazulmullick.lenslogger.plugin.network.LensKtorStateManager.logRequest
-import io.github.farhazulmullick.lenslogger.plugin.network.LensKtorStateManager.logRequestException
-import io.github.farhazulmullick.lenslogger.plugin.network.LensKtorStateManager.logResponse
-import io.github.farhazulmullick.lenslogger.plugin.network.LensKtorStateManager.logResponseException
+import io.github.farhazulmullick.lenslogger.modal.requestBody
+import io.github.farhazulmullick.lenslogger.plugin.network.LensNetworkLogStore.logRequestException
+import io.github.farhazulmullick.lenslogger.plugin.network.LensNetworkLogStore.logResponse
+import io.github.farhazulmullick.lenslogger.plugin.network.LensNetworkLogStore.logResponseException
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.HttpClientCall
@@ -46,7 +46,6 @@ import kotlinx.coroutines.delay
 
 internal val LensCallLoggingKey = AttributeKey<Int>("LensCallLoggingKey")
 internal val DisableLogging = AttributeKey<Unit>("LensDisableLogging")
-internal val CurrentTimeKey = AttributeKey<Long>("CurrentTimeKey")
 /** Marks a request as having been satisfied by a [MockRule] instead of the real network. */
 internal val LensIsMockedKey = AttributeKey<Boolean>("LensIsMockedKey")
 
@@ -108,7 +107,18 @@ public val LensHttpLogger: ClientPlugin<LoggingConfig> = createClientPlugin("Len
             return@on
         }
         val loggedRequest = try {
-            logRequest(request)
+            val bodyStr = if (level.body) {
+                try {
+                    request.requestBody()
+                } catch (e: Exception) {
+                    "[request body error: ${e.message}]"
+                }
+            } else {
+                null
+            }
+            val snapshot = request.toLensHttpRequestSnapshot(bodyStr)
+            val callId = LensNetworkLogStore.beginCall(snapshot)
+            request.attributes.put(LensCallLoggingKey, callId)
             request.body as OutgoingContent
         } catch (_: Throwable) {
             null
@@ -187,7 +197,10 @@ private fun installLensMocking(client: HttpClient) {
         ) ?: return@intercept
 
         request.attributes.put(LensIsMockedKey, true)
-        LensKtorStateManager.markMocked(request)
+        val callId = request.attributes.getOrNull(LensCallLoggingKey)
+        if (callId != null) {
+            LensNetworkLogStore.markMocked(callId)
+        }
 
         val mockStartMs = currentEpochMs()
 
@@ -199,7 +212,9 @@ private fun installLensMocking(client: HttpClient) {
             val failure = IOException(
                 "Lens mock: simulated failure for ${request.method.value} ${request.url.buildString()}"
             )
-            LensKtorStateManager.logMockedFailure(request, failure)
+            if (callId != null) {
+                LensNetworkLogStore.logMockedFailure(callId, failure)
+            }
             throw failure
         }
 
@@ -235,11 +250,13 @@ private fun installLensMocking(client: HttpClient) {
 
         // The ResponseObserver-driven logging path only runs when LogLevel.body is true and is
         // unreliable for synthesized calls, so we record the mocked response directly here.
-        LensKtorStateManager.logMockedResponse(
-            requestBuilder = request,
-            rule = rule,
-            responseTimeMs = currentEpochMs() - mockStartMs
-        )
+        if (callId != null) {
+            LensNetworkLogStore.logMockedResponse(
+                callId = callId,
+                rule = rule,
+                responseTimeMs = currentEpochMs() - mockStartMs,
+            )
+        }
 
         // Skip the engine phase entirely - the response is fully synthesized.
         subject = mockedCall

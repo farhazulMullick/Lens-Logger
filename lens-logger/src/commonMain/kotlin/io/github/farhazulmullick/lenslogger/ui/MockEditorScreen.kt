@@ -35,7 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import io.github.farhazulmullick.lenslogger.modal.NetworkLogs
-import io.github.farhazulmullick.lenslogger.plugin.network.LensKtorStateManager
+import io.github.farhazulmullick.lenslogger.plugin.network.LensNetworkLogStore
 import io.github.farhazulmullick.lenslogger.plugin.network.LensMockingStateManager
 import io.github.farhazulmullick.lenslogger.plugin.network.MockRule
 import io.ktor.http.HttpHeaders
@@ -60,17 +60,17 @@ fun MockEditorScreen(
 ) {
     val existing: MockRule? = ruleId?.let { LensMockingStateManager.findById(it) }
     val sourceLog: NetworkLogs? = sourceLogIndex?.let {
-        LensKtorStateManager.stateCalls.getOrNull(it)
+        LensNetworkLogStore.stateCalls.getOrNull(it)
     }
 
     val initialUrl = remember(existing, sourceLog) {
         existing?.url
-            ?: sourceLog?.requestData?.url?.buildString()
+            ?: sourceLog?.requestData?.url
             ?: ""
     }
     val initialMethod = remember(existing, sourceLog) {
         existing?.method
-            ?: sourceLog?.requestData?.method?.value
+            ?: sourceLog?.requestData?.method
             ?: "GET"
     }
     val initialStatus = remember(existing, sourceLog) {

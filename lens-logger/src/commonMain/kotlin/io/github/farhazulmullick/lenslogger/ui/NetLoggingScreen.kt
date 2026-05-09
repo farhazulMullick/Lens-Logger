@@ -51,14 +51,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextFieldDefaults
+import io.github.farhazulmullick.lenslogger.modal.LensHttpRequestSnapshot
 import io.github.farhazulmullick.lenslogger.modal.NetworkLogs
 import io.github.farhazulmullick.lenslogger.modal.Resource
-import io.github.farhazulmullick.lenslogger.modal.contentLength
 import io.github.farhazulmullick.lenslogger.modal.formatResponseTimeHuman
 import io.github.farhazulmullick.lenslogger.modal.getRequestedAgoTime
-import io.github.farhazulmullick.lenslogger.plugin.network.LensKtorStateManager
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.http.encodedPath
+import io.github.farhazulmullick.lenslogger.plugin.network.LensNetworkLogStore
 import lens.lens_logger.generated.resources.Res
 import lens.lens_logger.generated.resources.logger_no_data
 import org.jetbrains.compose.resources.painterResource
@@ -68,7 +66,7 @@ import kotlin.time.ExperimentalTime
 fun NetLoggingScreen(
     onItemClick: (Int) -> Unit
 ) {
-    val logs: SnapshotStateList<NetworkLogs> = LensKtorStateManager.stateCalls
+    val logs: SnapshotStateList<NetworkLogs> = LensNetworkLogStore.stateCalls
     val listState = rememberLazyListState()
     var searchQuery by remember { mutableStateOf("") }
     val queryTrimmed = searchQuery.trim()
@@ -76,7 +74,7 @@ fun NetLoggingScreen(
     val filteredLogs = logs.mapIndexed { index, log -> index to log }
         .filter { (_, log) ->
             if (queryTrimmed.isEmpty()) true
-            else log.requestData?.url?.encodedPath?.contains(queryTrimmed, ignoreCase = true) == true
+            else log.requestData?.encodedPath?.contains(queryTrimmed, ignoreCase = true) == true
         }
 
     LaunchedEffect(logs.size, queryTrimmed) {
@@ -258,7 +256,7 @@ fun NetLogCard(
     modifier: Modifier = Modifier,
     netLog: NetworkLogs
 ) {
-    val request: HttpRequestBuilder? = netLog.requestData
+    val request: LensHttpRequestSnapshot? = netLog.requestData
 
     Column(
         modifier = modifier,
@@ -296,7 +294,7 @@ fun NetLogCard(
         Spacer(modifier = Modifier.height(8.dp))
 
         // Endpoint Path
-        request?.url?.encodedPath?.let {
+        request?.encodedPath?.let {
             Text(it, style = MaterialTheme.typography.bodyLarge
                 .copy(fontFamily = FontFamily.Monospace), color = MaterialTheme.colorScheme.onSurface)
         }
@@ -310,10 +308,10 @@ fun NetLogCard(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 request?.let { req ->
-                    HttpMethodBadge(req.method.value)
+                    HttpMethodBadge(req.method)
                     NetMetricInline(
                         icon = Icons.Outlined.Upload,
-                        label = req.contentLength() ?: "0 B",
+                        label = req.contentLengthDisplay ?: "0 B",
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
                 }

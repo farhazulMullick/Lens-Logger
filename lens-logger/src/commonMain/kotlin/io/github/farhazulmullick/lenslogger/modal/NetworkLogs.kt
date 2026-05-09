@@ -30,10 +30,12 @@ import kotlin.time.ExperimentalTime
 private const val TAG = "NetworkLogs"
 data class NetworkLogs(
     val logLevel: LogLevel? = null,
-    val request: Resource<HttpRequestBuilder>? = Resource.Loading(),
+    val request: Resource<LensHttpRequestSnapshot>? = Resource.Loading(),
     val response: Resource<ResponseData>? = Resource.Loading(),
     val responseTime: Long? = null,
-    val isMocked: Boolean = false
+    val isMocked: Boolean = false,
+    /** Monotonic start time for this call; used to compute latency when completing from Ktor. */
+    val requestStartEpochMs: Long? = null,
 ) {
     val requestData = when (request) {
         is Resource.Success -> request.data

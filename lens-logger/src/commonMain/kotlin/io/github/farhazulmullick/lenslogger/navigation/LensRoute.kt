@@ -30,7 +30,7 @@ sealed class LensRoute {
     object MockListScreen: LensRoute()
 
     /**
-     * @param sourceLogIndex index into [io.github.farhazulmullick.lenslogger.plugin.network.LensKtorStateManager.stateCalls]
+     * @param sourceLogIndex index into [io.github.farhazulmullick.lenslogger.plugin.network.LensNetworkLogStore.stateCalls]
      *  used to prefill the editor when creating a new mock from a log entry. -1 if not applicable.
      * @param ruleId existing [io.github.farhazulmullick.lenslogger.plugin.network.MockRule] id when editing; null when creating.
      */

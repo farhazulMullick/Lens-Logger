@@ -47,21 +47,23 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 internal fun LensBottomSheet(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
+    sheetGesturesEnabled: Boolean = false,
     sheetShape: Shape = RoundedCornerShape(
         topStart = 16.dp,
         topEnd = 16.dp
     ),
     sheetElevation: Dp = 0.dp,
-    sheetState: SheetState = rememberModalBottomSheetState(),
-    scrimColor:Color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f),
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+    scrimColor: Color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f),
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainer,
-    containerColor:Color = Color.Transparent,
-    contentColor:Color = Color.Transparent,
+    containerColor: Color = Color.Transparent,
+    contentColor: Color = Color.Transparent,
     showCross: Boolean = true,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     ModalBottomSheet(
+        sheetGesturesEnabled = sheetGesturesEnabled,
         scrimColor = scrimColor,
         onDismissRequest = {
             scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -69,6 +71,10 @@ internal fun LensBottomSheet(
             }
         },
         sheetState = sheetState,
+        shape = sheetShape,
+        tonalElevation = sheetElevation,
+        containerColor = containerColor,
+        contentColor = contentColor,
         content = {
             Column(
                 modifier = Modifier
@@ -80,10 +86,11 @@ internal fun LensBottomSheet(
                      * Which works for both 3-button and gestures-bar.
                      */
                     .systemBarsPadding()
-                    .imePadding(), horizontalAlignment = Alignment.CenterHorizontally
+                    .imePadding(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                if(showCross){
+                if (showCross) {
                     CrossButton(
                         sheetState = sheetState,
                         onDismiss = onDismiss,
@@ -102,12 +109,13 @@ internal fun LensBottomSheet(
                         }
                     },
                     containerColor = Color.Transparent,
-                ) { paddingValues ->
+                ) { _ ->
                     Column(
                         modifier = Modifier
                             .clip(sheetShape)
                             .background(backgroundColor)
-                            .fillMaxWidth() then modifier,
+                            .fillMaxWidth()
+                            .then(modifier),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Spacer(modifier = Modifier.height(8.dp))
@@ -118,11 +126,8 @@ internal fun LensBottomSheet(
                 }
             }
         },
-        contentColor = contentColor,
-        containerColor = containerColor,
-        tonalElevation = sheetElevation,
         dragHandle = null,
-        properties = ModalBottomSheetProperties(shouldDismissOnBackPress = true)
+        properties = ModalBottomSheetProperties(shouldDismissOnBackPress = true),
     )
 }
 

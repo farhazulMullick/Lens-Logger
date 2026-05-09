@@ -52,6 +52,7 @@ fun LensApp(
     modifier: Modifier = Modifier,
     dataStores: List<DataStore<Preferences>> = emptyList(),
     showLensFAB: Boolean = true,
+    sheetGesturesEnabled: Boolean = false,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     content: @Composable () -> Unit = {},
 ) {
@@ -75,10 +76,11 @@ fun LensApp(
             }
         }
 
-        if (showContent){
+        if (showContent) {
             LensBottomSheet(
-                onDismiss = { showContent = !showContent },
-                sheetState = sheetState
+                onDismiss = { showContent = false },
+                sheetGesturesEnabled = sheetGesturesEnabled,
+                sheetState = sheetState,
             ) {
                 LensContent(dataStores)
             }

@@ -265,7 +265,7 @@ fun ResponsePageUI(
                                 color = MaterialTheme.colorScheme.onSurface,
                             )
                             Text(
-                                text = it.request?.url.toString(),
+                                text = it.request?.url?.toString() ?: it.sourceRequestUrl ?: "",
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontFamily = FontFamily.Monospace,
                                 style = MaterialTheme.typography.bodyMedium,

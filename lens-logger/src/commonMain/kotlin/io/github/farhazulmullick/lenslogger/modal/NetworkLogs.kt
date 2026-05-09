@@ -185,4 +185,6 @@ data class ResponseData(
     val requestTime: GMTDate? = null,
     val responseTime: GMTDate? = null,
     val contentLength: String? = null,
+    /** Present for non-Ktor pipelines (e.g. OkHttp/Retrofit) where [request] may be null. */
+    val sourceRequestUrl: String? = null,
 )

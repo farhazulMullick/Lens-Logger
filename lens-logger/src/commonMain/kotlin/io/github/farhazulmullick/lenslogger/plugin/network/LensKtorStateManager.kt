@@ -81,7 +81,8 @@ object LensKtorStateManager {
             request = null,
             requestTime = null,
             responseTime = null,
-            contentLength = rule.body.toByteArray(Charsets.UTF_8).size.formatDataPacket()
+            contentLength = rule.body.toByteArray(Charsets.UTF_8).size.formatDataPacket(),
+            sourceRequestUrl = requestBuilder.url.buildString(),
         )
 
         stateCalls[index] = stateCalls[index].copy(
@@ -134,6 +135,34 @@ object LensKtorStateManager {
 
         stateCalls[index] = stateCalls[index].copy(
             response = Resource.Failed(stateCalls[index].responseData, cause),
+        )
+    }
+
+    /**
+     * Completes an in-flight call (e.g. OkHttp / Retrofit) with a captured success [ResponseData].
+     */
+    fun completeCallWithSuccess(callIndex: Int, responseTimeMs: Long, data: ResponseData) {
+        if (callIndex !in stateCalls.indices) return
+        stateCalls[callIndex] = stateCalls[callIndex].copy(
+            response = Resource.Success(data),
+            responseTime = responseTimeMs
+        )
+    }
+
+    /** Transport failed before a response line was produced (mirror of [logResponseException]). */
+    fun completeCallWithResponseTransportFailure(callIndex: Int, cause: Throwable?) {
+        if (callIndex !in stateCalls.indices) return
+        stateCalls[callIndex] = stateCalls[callIndex].copy(
+            response = Resource.Failed(stateCalls[callIndex].responseData, cause),
+        )
+    }
+
+    /** Request never reached the backend (mirror of [logRequestException]). */
+    fun completeCallWithOutboundFailure(callIndex: Int, cause: Throwable?) {
+        if (callIndex !in stateCalls.indices) return
+        stateCalls[callIndex] = stateCalls[callIndex].copy(
+            request = Resource.Failed(stateCalls[callIndex].requestData, cause),
+            response = null,
         )
     }
 

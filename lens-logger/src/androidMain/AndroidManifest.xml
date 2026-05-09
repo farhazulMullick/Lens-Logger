@@ -4,7 +4,6 @@
         <provider
             android:name="io.github.farhazulmullick.lenslogger.plugin.network.LensContextProvider"
             android:authorities="${applicationId}.lenslogger.contextprovider"
-            android:exported="false"
-            android:initOrder="100" />
+            android:exported="false" />
     </application>
 </manifest>

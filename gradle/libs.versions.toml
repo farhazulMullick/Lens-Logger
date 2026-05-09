@@ -39,6 +39,8 @@ ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "k
 lens-module = { module = "io.github.farhazulmullick:lens-logger", version.ref = "lensLogger" }
 napier = { module = "io.github.aakira:napier", version.ref = "napierVersion" }
 kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.8.1" }
 datastore-core = { module = "androidx.datastore:datastore", version.ref = "datastoreVersion" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastoreVersion" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }

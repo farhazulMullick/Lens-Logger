@@ -99,7 +99,12 @@ internal fun LensContent(
                     Tab(
                         selected = selectedDestination == index,
                         onClick = {
-                            navController.navigate(route = destination.route)
+                            navController.navigate(route = destination.route) {
+                                popUpTo(navController.currentDestination?.route ?: "") {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+                            }
                             selectedDestination = index
                         },
                         text = {

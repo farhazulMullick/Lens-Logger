@@ -1,11 +1,7 @@
 package io.github.farhazulmullick.lenslogger.ui
 
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.foundation.layout.safeGesturesPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
@@ -14,8 +10,6 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -28,7 +22,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.zIndex
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.NavHostController
@@ -44,8 +37,6 @@ import io.github.farhazulmullick.lenslogger.plugin.network.LensMockingStateManag
 import io.github.farhazulmullick.lenslogger.showSnackBar
 import kotlinx.coroutines.flow.collectLatest
 
-private const val TAG = "LensApp"
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LensApp(
@@ -56,36 +47,13 @@ fun LensApp(
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     content: @Composable () -> Unit = {},
 ) {
-    var showContent by remember { mutableStateOf(false) }
-    MaterialTheme(
-        colorScheme = if(isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
-    ) {
-        Box(
-            modifier = Modifier
-                .zIndex(Float.MAX_VALUE)
-                .fillMaxSize()
-                .safeGesturesPadding()
-                .safeContentPadding()
-                .then(modifier)
-        ) {
-            // Lens FAB to show bottom sheet.
-            if (showLensFAB) {
-                LensFAB(modifier = Modifier) {
-                    showContent = !showContent
-                }
-            }
-        }
-
-        if (showContent) {
-            LensBottomSheet(
-                onDismiss = { showContent = false },
-                sheetGesturesEnabled = sheetGesturesEnabled,
-                sheetState = sheetState,
-            ) {
-                LensContent(dataStores)
-            }
-        }
-    }
+    LensOverlayHost(
+        modifier = modifier,
+        dataStores = dataStores,
+        showLensFAB = showLensFAB,
+        sheetGesturesEnabled = sheetGesturesEnabled,
+        sheetState = sheetState,
+    )
     content()
 }
 

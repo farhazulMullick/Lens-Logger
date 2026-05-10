@@ -39,6 +39,34 @@ lensLoggerVersion = "<version>"
 lens-logger = { module = "io.github.farhazulmullick:lens-logger", version.ref = "lensLoggerVersion" }
 ```
 
+### Publish to Maven Local (try in another project)
+
+From this repository root:
+
+```bash
+./gradlew publishToMavenLocal
+```
+
+Artifacts use `groupId` **`io.github.farhazulmullick`**, current `version` **`1.2.0-SNAPSHOT`** (see each module’s `build.gradle.kts` under `mavenPublishing { coordinates(...) }`). They are installed under `~/.m2/repository/io/github/farhazulmullick/`.
+
+**In a separate Android (or KMP) project**, add Maven Local and the dependency.
+
+`settings.gradle.kts` (top-level `dependencyManagement` / `pluginManagement` repositories, or `dependencyResolutionManagement.repositories`):
+
+```kotlin
+mavenLocal()
+```
+
+`app/build.gradle.kts` (or your shared `commonMain` source set for KMP):
+
+```kotlin
+dependencies {
+    implementation("io.github.farhazulmullick:lens-logger:1.2.0-SNAPSHOT")
+}
+```
+
+Your app must already use **Jetpack Compose** (and compatible Kotlin / Compose Compiler versions) because `lens-ui` is Compose-based. After changing the library, run `publishToMavenLocal` again and **Sync** / **Refresh dependencies** in the consumer so Gradle picks up the new snapshot.
+
 ## Usage
 
 ### 1. Integrate with Ktor Client
@@ -103,6 +131,36 @@ LensApp(
 This will display your app content and allow you to open the LensLogger UI overlay for network log inspection.
 
 > **Note:** Make sure you have set up LensLogger with your Ktor client as shown above in your network module.
+
+### 2b. Android: one-time install (no `LensApp` wrapper)
+
+For apps with **multiple activities** or **no single Compose root**, register the overlay once from your `Application` (main thread). This adds a `ComposeView` on top of each activity’s `android.R.id.content` so the Lens FAB appears without wrapping your root composable.
+
+```kotlin
+import android.app.Application
+import io.github.farhazulmullick.lenslogger.ui.LensAndroid
+import io.github.farhazulmullick.lenslogger.ui.LensInstallConfiguration
+
+class MyApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        LensAndroid.install(
+            this,
+            LensInstallConfiguration(
+                dataStoresProvider = { ctx ->
+                    // Return the same DataStore instances you would pass to LensApp
+                    emptyList()
+                },
+                showLensFAB = true,
+                sheetGesturesEnabled = false,
+                activityFilter = { activity -> true },
+            ),
+        )
+    }
+}
+```
+
+Register `android:name=".MyApp"` on `<application>` in the manifest. Call `LensAndroid.uninstall(this)` if you need to remove overlays (same `Application` instance as `install`).
 
 ## License
 

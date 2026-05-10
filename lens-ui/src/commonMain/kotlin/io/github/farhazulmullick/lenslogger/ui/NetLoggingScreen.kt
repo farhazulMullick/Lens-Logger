@@ -25,9 +25,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ElectricBolt
 import androidx.compose.material.icons.outlined.Upload
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -69,6 +72,7 @@ fun NetLoggingScreen(
     val logs: SnapshotStateList<NetworkLogs> = LensNetworkLogStore.stateCalls
     val listState = rememberLazyListState()
     var searchQuery by remember { mutableStateOf("") }
+    var overflowMenuExpanded by remember { mutableStateOf(false) }
     val queryTrimmed = searchQuery.trim()
 
     val filteredLogs = logs.mapIndexed { index, log -> index to log }
@@ -88,44 +92,72 @@ fun NetLoggingScreen(
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.surfaceContainer)
     ) {
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 8.dp),
-            placeholder = {
-                Text(
-                    "Search by endpoint",
-                    style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace)
-                )
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Filled.Search,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            },
-            trailingIcon = {
-                if (searchQuery.isNotEmpty()) {
-                    IconButton(onClick = { searchQuery = "" }) {
-                        Icon(
-                            imageVector = Icons.Filled.Close,
-                            contentDescription = "Clear search",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier.weight(1f),
+                placeholder = {
+                    Text(
+                        "Search by endpoint",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace)
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Search,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                trailingIcon = {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { searchQuery = "" }) {
+                            Icon(
+                                imageVector = Icons.Filled.Close,
+                                contentDescription = "Clear search",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                ),
+                textStyle = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace),
+            )
+            Box {
+                IconButton(onClick = { overflowMenuExpanded = true }) {
+                    Icon(
+                        imageVector = Icons.Filled.MoreVert,
+                        contentDescription = "More actions",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
-            },
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-            ),
-            textStyle = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace),
-        )
+                DropdownMenu(
+                    expanded = overflowMenuExpanded,
+                    onDismissRequest = { overflowMenuExpanded = false },
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Clear logs") },
+                        onClick = {
+                            LensKtorStateManager.clear()
+                            searchQuery = ""
+                            overflowMenuExpanded = false
+                        },
+                    )
+                }
+            }
+        }
 
         when {
             logs.isEmpty() -> {

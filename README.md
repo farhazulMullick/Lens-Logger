@@ -107,34 +107,27 @@ val client = HttpClient(engine) {
 
 ```
 
-### 2. Setup LensApp UI
+### 2. Lens UI (Compose) and Android without a Compose root
 
-Simply wrap your app's root composable with `LensApp`. This will enable the LensLogger UI and log request/response in your app.
-
+**Compose root:** wrap your app with `LensApp`. It draws a draggable `LensFAB` that opens `LensBottomSheet` with the inspector (`LensContent`). Pass `dataStores` for the DataStore tab.
 
 ```kotlin
 import io.github.farhazulmullick.lenslogger.ui.LensApp
 import androidx.compose.ui.Modifier
 
 LensApp(
-    modifier = Modifier.fillMaxSize(), 
-    // by default enabled, set to false to disable.
+    modifier = Modifier.fillMaxSize(),
     showLensFAB = true,
-    // Optional: For DataStore Visualizer
-    dataStores = listOf(DataStores<Preferences>) 
+    sheetGesturesEnabled = false,
+    dataStores = myDataStores,
 ) {
-    // Your app content goes here
     App()
 }
 ```
 
-This will display your app content and allow you to open the LensLogger UI overlay for network log inspection.
+> **Note:** There is **no** window-level `ComposeView` overlay on activities; the FAB lives in your Compose tree only.
 
-> **Note:** Make sure you have set up LensLogger with your Ktor client as shown above in your network module.
-
-### 2b. Android: one-time install (no `LensApp` wrapper)
-
-For apps with **multiple activities** or **no single Compose root**, register once from your `Application` (main thread). By default (`LensEntryMode.WINDOW_OVERLAY`), this adds a `ComposeView` on top of each activity’s `android.R.id.content` so the Lens FAB appears without wrapping your root composable. For a **notification-only** entry (no overlay), see **2c**.
+**Android, no Compose root:** `LensAndroid.install` posts a **persistent notification** that opens **`LensActivity`** (full-screen inspector). `LensInstallConfiguration` only needs **`dataStoresProvider`**.
 
 ```kotlin
 import android.app.Application
@@ -146,51 +139,15 @@ class MyApp : Application() {
         super.onCreate()
         LensAndroid.install(
             this,
-            LensInstallConfiguration(
-                dataStoresProvider = { ctx ->
-                    // Return the same DataStore instances you would pass to LensApp
-                    emptyList()
-                },
-                showLensFAB = true,
-                sheetGesturesEnabled = false,
-                activityFilter = { activity -> true },
-            ),
+            LensInstallConfiguration(dataStoresProvider = { ctx -> emptyList() }),
         )
     }
 }
 ```
 
-Register `android:name=".MyApp"` on `<application>` in the manifest. Call `LensAndroid.uninstall(this)` to remove overlays and/or cancel the persistent notification (same `Application` instance as `install`).
+Register `android:name=".MyApp"`. Call **`LensAndroid.uninstall(this)`** to cancel the notification and clear cached DataStores. **`LensAndroid.refreshPersistentNotification(application)`** after granting **`POST_NOTIFICATIONS`** (API 33+) if the notification was skipped at install.
 
-### 2c. Android: persistent notification + `LensActivity` (no window overlay)
-
-Use `LensEntryMode.PERSISTENT_NOTIFICATION` to show an **ongoing notification** that opens `LensActivity` with the same full-screen inspector as the in-app bottom sheet (`LensContent`). No `ComposeView` is attached to your activities.
-
-- The library merges **`POST_NOTIFICATIONS`** (API 33+). Request runtime permission before or after `install`; if it is missing at install time, Lens logs a warning and skips posting until you call **`LensAndroid.refreshPersistentNotification(application)`**.
-- You can also open the UI with **`LensActivity.createIntent(context)`** from your own code.
-- **`LensAndroid.uninstall`** cancels the notification and clears cached `DataStore` references used by `LensActivity`.
-
-```kotlin
-import android.app.Application
-import io.github.farhazulmullick.lenslogger.ui.LensAndroid
-import io.github.farhazulmullick.lenslogger.ui.LensEntryMode
-import io.github.farhazulmullick.lenslogger.ui.LensInstallConfiguration
-
-class MyApp : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        LensAndroid.install(
-            this,
-            LensInstallConfiguration(
-                entryMode = LensEntryMode.PERSISTENT_NOTIFICATION,
-                dataStoresProvider = { ctx -> emptyList() },
-            ),
-        )
-    }
-}
-```
-
-**iOS:** A similar “entry without wrapping the whole Compose tree” experience would use platform APIs (e.g. local notifications, deep links, or share extension); it is not implemented in this milestone.
+**iOS:** embed the inspector in your own UI or navigation; notification entry is not provided here.
 
 ## License
 

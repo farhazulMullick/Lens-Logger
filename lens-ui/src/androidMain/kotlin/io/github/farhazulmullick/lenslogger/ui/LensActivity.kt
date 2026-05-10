@@ -15,8 +15,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.Modifier
 
 /**
- * Full-screen Lens inspector (network, DataStore, mocks). Typically opened from the persistent
- * notification when using [LensEntryMode.PERSISTENT_NOTIFICATION], or via [createIntent].
+ * Full-screen Lens inspector (network, DataStore, mocks). Opened from the persistent notification
+ * after [LensAndroid.install], or via [createIntent].
  */
 class LensActivity : ComponentActivity() {
 

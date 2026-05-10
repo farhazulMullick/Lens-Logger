@@ -5,7 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 
 /**
- * Holds resolved [DataStore] instances for [LensActivity] when using [LensEntryMode.PERSISTENT_NOTIFICATION].
+ * Holds resolved [DataStore] instances for [LensActivity] after [LensAndroid.install].
  */
 internal object LensRuntimeState {
 

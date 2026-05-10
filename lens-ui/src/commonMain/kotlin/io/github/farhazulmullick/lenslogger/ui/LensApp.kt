@@ -1,9 +1,11 @@
 package io.github.farhazulmullick.lenslogger.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.safeGesturesPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
@@ -22,6 +24,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.zIndex
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.NavHostController
@@ -47,13 +50,34 @@ fun LensApp(
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     content: @Composable () -> Unit = {},
 ) {
-    LensOverlayHost(
-        modifier = modifier,
-        dataStores = dataStores,
-        showLensFAB = showLensFAB,
-        sheetGesturesEnabled = sheetGesturesEnabled,
-        sheetState = sheetState,
-    )
+    var showContent by remember { mutableStateOf(false) }
+    LensMaterialTheme {
+        Box(
+            modifier = Modifier
+                .zIndex(Float.MAX_VALUE)
+                .fillMaxSize()
+                .safeGesturesPadding()
+                .safeContentPadding()
+                .then(modifier)
+        ) {
+            // Lens FAB to show bottom sheet.
+            if (showLensFAB) {
+                LensFAB(modifier = Modifier) {
+                    showContent = !showContent
+                }
+            }
+        }
+
+        if (showContent) {
+            LensBottomSheet(
+                onDismiss = { showContent = false },
+                sheetGesturesEnabled = sheetGesturesEnabled,
+                sheetState = sheetState,
+            ) {
+                LensContent(dataStores)
+            }
+        }
+    }
     content()
 }
 
@@ -121,11 +145,11 @@ internal fun LensContent(
         CompositionLocalProvider(
             LocalSnackBarHostState provides snackBarHostState
         ){ AppNavHost(
-                modifier = Modifier.padding(contentPadding),
-                startDestination = startDestination,
-                navController = navController,
-                dataStores = dataStores
-            )
+            modifier = Modifier.padding(contentPadding),
+            startDestination = startDestination,
+            navController = navController,
+            dataStores = dataStores
+        )
         }
     }
 }

@@ -21,6 +21,14 @@ import androidx.compose.ui.zIndex
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 
+@Composable
+internal fun LensMaterialTheme(content: @Composable () -> Unit) {
+    MaterialTheme(
+        colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme(),
+        content = content,
+    )
+}
+
 /**
  * Floating Lens FAB and inspector bottom sheet, without wrapping host app content.
  *
@@ -37,9 +45,7 @@ fun LensOverlayHost(
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
 ) {
     var showContent by remember { mutableStateOf(false) }
-    MaterialTheme(
-        colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
-    ) {
+    LensMaterialTheme {
         Box(
             modifier = Modifier
                 .zIndex(Float.MAX_VALUE)

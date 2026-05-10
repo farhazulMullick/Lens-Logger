@@ -150,7 +150,7 @@ fun NetLoggingScreen(
                     DropdownMenuItem(
                         text = { Text("Clear logs") },
                         onClick = {
-                            LensKtorStateManager.clear()
+                            LensNetworkLogStore.clear()
                             searchQuery = ""
                             overflowMenuExpanded = false
                         },

@@ -75,7 +75,10 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
-        androidMain.dependencies {}
+        androidMain.dependencies {
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.core.ktx)
+        }
         desktopMain.dependencies {}
 
         val iosMain by creating { dependsOn(commonMain.get()) }

@@ -134,7 +134,7 @@ This will display your app content and allow you to open the LensLogger UI overl
 
 ### 2b. Android: one-time install (no `LensApp` wrapper)
 
-For apps with **multiple activities** or **no single Compose root**, register the overlay once from your `Application` (main thread). This adds a `ComposeView` on top of each activity’s `android.R.id.content` so the Lens FAB appears without wrapping your root composable.
+For apps with **multiple activities** or **no single Compose root**, register once from your `Application` (main thread). By default (`LensEntryMode.WINDOW_OVERLAY`), this adds a `ComposeView` on top of each activity’s `android.R.id.content` so the Lens FAB appears without wrapping your root composable. For a **notification-only** entry (no overlay), see **2c**.
 
 ```kotlin
 import android.app.Application
@@ -160,7 +160,37 @@ class MyApp : Application() {
 }
 ```
 
-Register `android:name=".MyApp"` on `<application>` in the manifest. Call `LensAndroid.uninstall(this)` if you need to remove overlays (same `Application` instance as `install`).
+Register `android:name=".MyApp"` on `<application>` in the manifest. Call `LensAndroid.uninstall(this)` to remove overlays and/or cancel the persistent notification (same `Application` instance as `install`).
+
+### 2c. Android: persistent notification + `LensActivity` (no window overlay)
+
+Use `LensEntryMode.PERSISTENT_NOTIFICATION` to show an **ongoing notification** that opens `LensActivity` with the same full-screen inspector as the in-app bottom sheet (`LensContent`). No `ComposeView` is attached to your activities.
+
+- The library merges **`POST_NOTIFICATIONS`** (API 33+). Request runtime permission before or after `install`; if it is missing at install time, Lens logs a warning and skips posting until you call **`LensAndroid.refreshPersistentNotification(application)`**.
+- You can also open the UI with **`LensActivity.createIntent(context)`** from your own code.
+- **`LensAndroid.uninstall`** cancels the notification and clears cached `DataStore` references used by `LensActivity`.
+
+```kotlin
+import android.app.Application
+import io.github.farhazulmullick.lenslogger.ui.LensAndroid
+import io.github.farhazulmullick.lenslogger.ui.LensEntryMode
+import io.github.farhazulmullick.lenslogger.ui.LensInstallConfiguration
+
+class MyApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        LensAndroid.install(
+            this,
+            LensInstallConfiguration(
+                entryMode = LensEntryMode.PERSISTENT_NOTIFICATION,
+                dataStoresProvider = { ctx -> emptyList() },
+            ),
+        )
+    }
+}
+```
+
+**iOS:** A similar “entry without wrapping the whole Compose tree” experience would use platform APIs (e.g. local notifications, deep links, or share extension); it is not implemented in this milestone.
 
 ## License
 

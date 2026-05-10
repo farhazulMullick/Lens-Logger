@@ -13,15 +13,13 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import java.util.IdentityHashMap
 
 /**
- * Installs a per-activity [ComposeView] hosting [LensOverlayHost] on the activity's
- * [android.R.id.content] [FrameLayout], so the Lens FAB is available without wrapping
- * your root composable in [LensApp].
+ * Installs Lens on Android without wrapping your root composable in [LensApp].
  *
- * Call [install] once from [Application.onCreate] on the main thread. Use
- * [LensInstallConfiguration.activityFilter] to exclude specific activities.
+ * - [LensEntryMode.WINDOW_OVERLAY]: attaches a [ComposeView] on each activity’s content (default).
+ * - [LensEntryMode.PERSISTENT_NOTIFICATION]: shows an ongoing notification that opens [LensActivity].
  *
- * This does not use [android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY]; the
- * overlay stays within your app's window.
+ * Call [install] once from [Application.onCreate] on the main thread. Use [uninstall] with the same
+ * [Application] instance to tear down.
  */
 object LensAndroid {
 
@@ -29,6 +27,7 @@ object LensAndroid {
     private var installedApplication: Application? = null
     private var callbacks: Application.ActivityLifecycleCallbacks? = null
     private val overlayByActivity = IdentityHashMap<Activity, ComposeView>()
+    private var activeEntryMode: LensEntryMode? = null
 
     @JvmStatic
     fun install(
@@ -37,49 +36,80 @@ object LensAndroid {
     ) {
         checkMainThread()
         synchronized(lock) {
-            if (callbacks != null) return
-            val cb = object : Application.ActivityLifecycleCallbacks {
-                override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
+            if (installedApplication != null) return
+            installedApplication = application
+            activeEntryMode = configuration.entryMode
 
-                override fun onActivityStarted(activity: Activity) {
-                    activity.window?.decorView?.post {
-                        attachOverlay(activity, configuration)
+            when (configuration.entryMode) {
+                LensEntryMode.WINDOW_OVERLAY -> {
+                    val cb = object : Application.ActivityLifecycleCallbacks {
+                        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
+
+                        override fun onActivityStarted(activity: Activity) {
+                            activity.window?.decorView?.post {
+                                attachOverlay(activity, configuration)
+                            }
+                        }
+
+                        override fun onActivityResumed(activity: Activity) {}
+
+                        override fun onActivityPaused(activity: Activity) {}
+
+                        override fun onActivityStopped(activity: Activity) {}
+
+                        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+
+                        override fun onActivityDestroyed(activity: Activity) {
+                            detachOverlay(activity)
+                        }
                     }
+                    application.registerActivityLifecycleCallbacks(cb)
+                    callbacks = cb
                 }
 
-                override fun onActivityResumed(activity: Activity) {}
-
-                override fun onActivityPaused(activity: Activity) {}
-
-                override fun onActivityStopped(activity: Activity) {}
-
-                override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
-
-                override fun onActivityDestroyed(activity: Activity) {
-                    detachOverlay(activity)
+                LensEntryMode.PERSISTENT_NOTIFICATION -> {
+                    callbacks = null
+                    LensRuntimeState.installFrom(application, configuration)
+                    LensNotificationHelper.showPersistent(application)
                 }
             }
-            application.registerActivityLifecycleCallbacks(cb)
-            callbacks = cb
-            installedApplication = application
         }
     }
 
     /**
-     * Unregisters lifecycle callbacks and removes any overlay views still attached.
+     * Re-shows the persistent notification after [android.Manifest.permission.POST_NOTIFICATIONS]
+     * is granted (API 33+). No-op if [install] was not called with [LensEntryMode.PERSISTENT_NOTIFICATION]
+     * or if [application] is not the installed instance.
+     */
+    @JvmStatic
+    fun refreshPersistentNotification(application: Application) {
+        checkMainThread()
+        synchronized(lock) {
+            if (installedApplication !== application) return
+            if (activeEntryMode != LensEntryMode.PERSISTENT_NOTIFICATION) return
+            LensNotificationHelper.showPersistent(application)
+        }
+    }
+
+    /**
+     * Unregisters lifecycle callbacks, removes overlay views, cancels the persistent notification (if any),
+     * and clears runtime state.
      */
     @JvmStatic
     fun uninstall(application: Application) {
         checkMainThread()
         synchronized(lock) {
-            val cb = callbacks ?: return
+            if (installedApplication == null) return
             check(application === installedApplication) {
                 "LensAndroid.uninstall must be called with the same Application passed to install"
             }
-            application.unregisterActivityLifecycleCallbacks(cb)
+            callbacks?.let { application.unregisterActivityLifecycleCallbacks(it) }
             callbacks = null
-            installedApplication = null
             overlayByActivity.keys.toList().forEach { detachOverlay(it) }
+            LensNotificationHelper.cancel(application)
+            LensRuntimeState.clear()
+            activeEntryMode = null
+            installedApplication = null
         }
     }
 

@@ -10,9 +10,10 @@ This helps you quickly identify issues and monitor network activity during devel
 
 ## Features
 - ✨ Seamless integration with Ktor HTTP client
+- 🔌 OkHttp application interceptor for Retrofit / raw `OkHttpClient` (Android and JVM desktop)
 - 📱 Works on both Android and iOS (KMP)
 - 🔍 Logs all network requests and responses
-- 🖥️ Built-in UI for real-time log inspection
+- 🖥️ Built-in UI for real-time log inspection and mocking
 - 🛠️ Minimal setup and easy to use
 - ✨ DataStore Visualizer
 
@@ -107,9 +108,35 @@ val client = HttpClient(engine) {
 
 ```
 
-### 2. Lens UI (Compose) and Android without a Compose root
+### 2. OkHttp / Retrofit (Android and JVM desktop)
 
-**Compose root:** wrap your app with `LensApp`. It draws a draggable `LensFAB` that opens `LensBottomSheet` with the inspector (`LensContent`). Pass `dataStores` for the DataStore tab.
+Install **`LensOkHttpInterceptor`** on the **application** interceptor chain of the `OkHttpClient` you use with Retrofit (or any OkHttp-based API). The library exposes a small helper:
+
+```kotlin
+import io.github.farhazulmullick.lenslogger.plugin.network.installLensInterceptor
+import okhttp3.OkHttpClient
+
+val okHttpClient = OkHttpClient.Builder()
+    .installLensInterceptor()
+    // other interceptors, timeouts, etc.
+    .build()
+```
+
+Equivalent without the extension:
+
+```kotlin
+import io.github.farhazulmullick.lenslogger.plugin.network.LensOkHttpInterceptor
+
+OkHttpClient.Builder()
+    .addInterceptor(LensOkHttpInterceptor())
+    .build()
+```
+
+Calls made through this client appear in the same network log store as Ktor traffic, so they show up in the Lens inspector and respect the same mocking rules where applicable. The interceptor uses blocking work internally; keep it on clients that run network I/O off the main thread (typical for Retrofit).
+
+### 3. Lens UI — Compose root (`LensApp`)
+
+When your root UI is Compose, wrap your app with `LensApp`. That adds a draggable FAB that opens the bottom sheet inspector (`LensContent`). Pass `dataStores` if you use the DataStore tab.
 
 ```kotlin
 import io.github.farhazulmullick.lenslogger.ui.LensApp
@@ -125,9 +152,13 @@ LensApp(
 }
 ```
 
-> **Note:** There is **no** window-level `ComposeView` overlay on activities; the FAB lives in your Compose tree only.
+There is **no** separate window-level `ComposeView` overlay on activities: the FAB lives in your Compose tree only.
 
-**Android, no Compose root:** `LensAndroid.install` posts a **persistent notification** that opens **`LensActivity`** (full-screen inspector). `LensInstallConfiguration` only needs **`dataStoresProvider`**.
+> **Note:** Wire at least one of **Ktor** (step 1) or **OkHttp** (step 2) so the Network tab has traffic to show.
+
+### 4. Android without a Compose root (`LensAndroid`)
+
+If you do **not** have a single Compose root (classic `Activity` / XML / fragments), skip `LensApp` and call **`LensAndroid.install`** once from **`Application.onCreate`** on the main thread. That posts a **persistent notification** that opens **`LensActivity`** (full-screen inspector). Configuration only needs a **`dataStoresProvider`** (return an empty list if you do not use DataStore in Lens).
 
 ```kotlin
 import android.app.Application
@@ -145,9 +176,9 @@ class MyApp : Application() {
 }
 ```
 
-Register `android:name=".MyApp"`. Call **`LensAndroid.uninstall(this)`** to cancel the notification and clear cached DataStores. **`LensAndroid.refreshPersistentNotification(application)`** after granting **`POST_NOTIFICATIONS`** (API 33+) if the notification was skipped at install.
+Register the application class in the manifest (`android:name=".MyApp"`). Call **`LensAndroid.uninstall(this)`** with the same `Application` to cancel the notification and clear cached DataStores. After the user grants **`POST_NOTIFICATIONS`** (API 33+), call **`LensAndroid.refreshPersistentNotification(application)`** if the notification was not shown at install time.
 
-**iOS:** embed the inspector in your own UI or navigation; notification entry is not provided here.
+**iOS:** use your own navigation to embed or present the shared inspector UI as needed; the notification-based entry point is Android-only.
 
 ## License
 

@@ -6,6 +6,7 @@ android-targetSdk = "35"
 androidx-activity = "1.10.1"
 androidx-lifecycle = "2.8.0"
 composeMultiplatform = "1.8.1"
+jetbrainsComposeMaterial3 = "1.9.0"
 kotlin = "2.1.21"
 kotlinStdlib = "2.1.21"
 lensLogger = "1.0.0"
@@ -18,6 +19,7 @@ kotlinx-coroutines = "1.10.2"
 datastoreVersion = "1.1.7"
 
 [libraries]
+jetbrains-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "jetbrainsComposeMaterial3" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }

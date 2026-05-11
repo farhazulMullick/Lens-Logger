@@ -27,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -65,7 +66,9 @@ private const val TAG = "NetLoggingInfoScreen"
 @Composable
 fun NetLoggingInfoScreen(
     index: Int,
-    onBackClick: () -> Unit) {
+    onMockClick: (Int) -> Unit = {},
+    onBackClick: () -> Unit
+) {
     val netLogs: NetworkLogs? = LensKtorStateManager.stateCalls.getOrNull(index)
     Scaffold (
         modifier = Modifier,
@@ -90,6 +93,10 @@ fun NetLoggingInfoScreen(
                         color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Monospace),
                     )
+                    if (netLogs?.isMocked == true) {
+                        HSpacer(8.dp)
+                        MockedBadge()
+                    }
                 }
                 VSpacer(4.dp)
             }
@@ -97,20 +104,31 @@ fun NetLoggingInfoScreen(
         bottomBar = {
             // using deprecated api since new clipboard api in compose 1.8 is trivial to use.
             val clipboard: ClipboardManager = LocalClipboardManager.current
-            Button(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                onClick = {
-                    val curl = netLogs?.requestData?.generateCurl()
-                    curl ?.let {
-                        clipboard.setText(AnnotatedString(curl))
-                        Platform.showSnackBar("cURL copied to clipboard!")
-                    }
-                    Napier.d(tag = TAG){"$TAG :: cURL :: ${netLogs?.requestData?.generateCurl()}"}
-                }
+                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
             ) {
-                Text("Copy cURL")
+                OutlinedButton(
+                    modifier = Modifier.weight(1f),
+                    onClick = { onMockClick(index) }
+                ) {
+                    Text("Mock this")
+                }
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        val curl = netLogs?.requestData?.generateCurl()
+                        curl?.let {
+                            clipboard.setText(AnnotatedString(curl))
+                            Platform.showSnackBar("cURL copied to clipboard!")
+                        }
+                        Napier.d(tag = TAG) { "$TAG :: cURL :: ${netLogs?.requestData?.generateCurl()}" }
+                    }
+                ) {
+                    Text("Copy cURL")
+                }
             }
         }
     ){

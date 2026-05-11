@@ -5,14 +5,20 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import io.github.farhazulmullick.lenslogger.modal.NetworkLogs
 import io.github.farhazulmullick.lenslogger.modal.Resource
 import io.github.farhazulmullick.lenslogger.modal.ResponseData
+import io.github.farhazulmullick.lenslogger.modal.formatDataPacket
 import io.github.farhazulmullick.lenslogger.modal.toResponseData
 import io.ktor.client.request.HttpRequest
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.request
+import io.ktor.http.HttpStatusCode
 import io.ktor.utils.io.InternalAPI
+import io.ktor.utils.io.charsets.Charsets
+import io.ktor.utils.io.core.toByteArray
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -30,6 +36,72 @@ object LensKtorStateManager {
 
             stateCalls.add(log)
         }
+    }
+
+    /**
+     * Marks the [NetworkLogs] entry corresponding to this in-flight [requestBuilder] as having
+     * been satisfied by a [MockRule]. Called from the mocking interceptor right after the rule
+     * is matched. Safe to call before [logResponse].
+     */
+    fun markMocked(requestBuilder: HttpRequestBuilder) {
+        val index = requestBuilder.attributes.getOrNull(LensCallLoggingKey) ?: return
+        if (index !in stateCalls.indices) return
+        stateCalls[index] = stateCalls[index].copy(isMocked = true)
+    }
+
+    /**
+     * Records a synthesized success response for a mocked request directly from a [MockRule],
+     * without depending on the [io.ktor.client.plugins.observer.ResponseObserver] (which only
+     * runs when the configured [io.ktor.client.plugins.logging.LogLevel] includes a body).
+     */
+    @OptIn(ExperimentalTime::class)
+    fun logMockedResponse(
+        requestBuilder: HttpRequestBuilder,
+        rule: MockRule,
+        responseTimeMs: Long
+    ) {
+        val index = requestBuilder.attributes.getOrNull(LensCallLoggingKey) ?: return
+        if (index !in stateCalls.indices) return
+
+        val prettyBody = if (rule.body.isBlank()) {
+            rule.body
+        } else {
+            try {
+                val pretty = Json { prettyPrint = true }
+                pretty.encodeToString(JsonElement.serializer(), Json.parseToJsonElement(rule.body))
+            } catch (_: Throwable) {
+                rule.body
+            }
+        }
+
+        val responseData = ResponseData(
+            status = HttpStatusCode.fromValue(rule.statusCode),
+            headers = rule.headers,
+            body = prettyBody,
+            request = null,
+            requestTime = null,
+            responseTime = null,
+            contentLength = rule.body.toByteArray(Charsets.UTF_8).size.formatDataPacket()
+        )
+
+        stateCalls[index] = stateCalls[index].copy(
+            response = Resource.Success(responseData),
+            responseTime = responseTimeMs,
+            isMocked = true
+        )
+    }
+
+    /**
+     * Records a synthesized failure response for a mocked request configured with
+     * [MockRule.simulateFailure].
+     */
+    fun logMockedFailure(requestBuilder: HttpRequestBuilder, cause: Throwable?) {
+        val index = requestBuilder.attributes.getOrNull(LensCallLoggingKey) ?: return
+        if (index !in stateCalls.indices) return
+        stateCalls[index] = stateCalls[index].copy(
+            response = Resource.Failed(stateCalls[index].responseData, cause),
+            isMocked = true
+        )
     }
 
     @OptIn(ExperimentalTime::class, InternalAPI::class)

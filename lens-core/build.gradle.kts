@@ -1,24 +1,22 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.composeHotReload)
+    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.vanniktech.publish)
 }
 
-/**
- * Convenience aggregate: pulls in [lens-core], [lens-ui], [lens-ktor], and (Android/desktop only)
- * [lens-okhttp]. For smaller binaries or clearer boundaries, depend on the sub-artifacts directly.
- */
 mavenPublishing {
     coordinates(
         groupId = "io.github.farhazulmullick",
-        artifactId = "lens-logger",
+        artifactId = "lens-core",
         version = "1.2.0-SNAPSHOT",
     )
     pom {
-        name.set("Lens Logger")
+        name.set("Lens Core")
         description.set(
-            "Kotlin Multiplatform library for debugging network requests with optional Ktor, OkHttp, and Compose UI modules."
+            "Transport-neutral network log store, HTTP snapshots, mock rules, and DataStore helpers for Lens."
         )
         inceptionYear.set("2025")
         url.set("https://github.com/farhazulMullick/Lens/")
@@ -49,11 +47,7 @@ kotlin {
         iosX64(),
         iosArm64(),
         iosSimulatorArm64(),
-    ).forEach {
-        it.binaries.framework {
-            baseName = "lensktorKit"
-        }
-    }
+    )
 
     jvm("desktop")
     androidTarget()
@@ -62,21 +56,33 @@ kotlin {
         val desktopMain by getting
 
         commonMain.dependencies {
-            api(project(":lens-core"))
-            api(project(":lens-ui"))
-            api(project(":lens-ktor"))
+            implementation(libs.kotlin.stdlib)
+            implementation(compose.runtime)
+            implementation(libs.jetbrains.material3)
+            implementation(libs.napier)
+            implementation(libs.datastore.core)
+            implementation(libs.datastore.preferences)
+            implementation(libs.ktor.client.core)
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.serialization.json)
         }
-        androidMain.dependencies {
-            api(project(":lens-okhttp"))
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
         }
-        desktopMain.dependencies {
-            api(project(":lens-okhttp"))
-        }
+        androidMain.dependencies {}
+        desktopMain.dependencies {}
+
+        val iosMain by creating { dependsOn(commonMain.get()) }
+        val iosArm64Main by getting
+        val iosSimulatorArm64Main by getting
+        val iosX64Main by getting
+        listOf(iosArm64Main, iosSimulatorArm64Main, iosX64Main).forEach { it.dependsOn(iosMain) }
+        iosMain.dependencies {}
     }
 }
 
 android {
-    namespace = "io.github.farhazulmullick.lenslogger"
+    namespace = "io.github.farhazulmullick.lenslogger.core"
     compileSdk = 35
     defaultConfig { minSdk = 23 }
     compileOptions {

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lens_activity_label">Lens</string>
+    <string name="lens_notification_channel_name">Lens debug</string>
+    <string name="lens_notification_channel_description">Opens the Lens network and DataStore inspector</string>
+    <string name="lens_notification_title">Lens</string>
+    <string name="lens_notification_text">Tap to open the inspector</string>
+</resources>

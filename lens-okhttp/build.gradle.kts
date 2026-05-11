@@ -1,25 +1,19 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.composeHotReload)
+    alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.vanniktech.publish)
 }
 
-/**
- * Convenience aggregate: pulls in [lens-core], [lens-ui], [lens-ktor], and (Android/desktop only)
- * [lens-okhttp]. For smaller binaries or clearer boundaries, depend on the sub-artifacts directly.
- */
 mavenPublishing {
     coordinates(
         groupId = "io.github.farhazulmullick",
-        artifactId = "lens-logger",
+        artifactId = "lens-okhttp",
         version = "1.2.0-SNAPSHOT",
     )
     pom {
-        name.set("Lens Logger")
-        description.set(
-            "Kotlin Multiplatform library for debugging network requests with optional Ktor, OkHttp, and Compose UI modules."
-        )
+        name.set("Lens OkHttp")
+        description.set("OkHttp interceptor for Lens network logging and mocking (Android and JVM desktop).")
         inceptionYear.set("2025")
         url.set("https://github.com/farhazulMullick/Lens/")
         licenses {
@@ -45,38 +39,25 @@ mavenPublishing {
 }
 
 kotlin {
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64(),
-    ).forEach {
-        it.binaries.framework {
-            baseName = "lensktorKit"
-        }
-    }
-
-    jvm("desktop")
     androidTarget()
+    jvm("desktop")
 
     sourceSets {
         val desktopMain by getting
 
         commonMain.dependencies {
             api(project(":lens-core"))
-            api(project(":lens-ui"))
-            api(project(":lens-ktor"))
+            implementation(libs.okhttp)
+            implementation(libs.ktor.client.core)
+            implementation(libs.kotlinx.serialization.json)
         }
-        androidMain.dependencies {
-            api(project(":lens-okhttp"))
-        }
-        desktopMain.dependencies {
-            api(project(":lens-okhttp"))
-        }
+        androidMain.dependencies {}
+        desktopMain.dependencies {}
     }
 }
 
 android {
-    namespace = "io.github.farhazulmullick.lenslogger"
+    namespace = "io.github.farhazulmullick.lenslogger.okhttp"
     compileSdk = 35
     defaultConfig { minSdk = 23 }
     compileOptions {

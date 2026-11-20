@@ -4,8 +4,10 @@ android-compileSdk = "35"
 android-minSdk = "24"
 android-targetSdk = "35"
 androidx-activity = "1.10.1"
+androidx-core = "1.15.0"
 androidx-lifecycle = "2.8.0"
 composeMultiplatform = "1.8.1"
+jetbrainsComposeMaterial3 = "1.9.0"
 kotlin = "2.1.21"
 kotlinStdlib = "2.1.21"
 lensLogger = "1.0.0"
@@ -16,10 +18,13 @@ vanniktech = "0.32.0"
 composeHotReload = "1.0.0-alpha11"
 kotlinx-coroutines = "1.10.2"
 datastoreVersion = "1.1.7"
+okhttp = "4.12.0"
 
 [libraries]
+jetbrains-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "jetbrainsComposeMaterial3" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlinStdlib" }
@@ -36,8 +41,11 @@ ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "k
 lens-module = { module = "io.github.farhazulmullick:lens-logger", version.ref = "lensLogger" }
 napier = { module = "io.github.aakira:napier", version.ref = "napierVersion" }
 kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.8.1" }
 datastore-core = { module = "androidx.datastore:datastore", version.ref = "datastoreVersion" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastoreVersion" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -30,5 +30,9 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "lens"
-include(":composeApp")
+include(":lens-core")
+include(":lens-ktor")
+include(":lens-okhttp")
+include(":lens-ui")
 include(":lens-logger")
+include(":composeApp")

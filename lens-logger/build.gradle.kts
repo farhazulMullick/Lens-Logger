@@ -1,27 +1,24 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.vanniktech.publish)
     alias(libs.plugins.composeHotReload)
+    alias(libs.plugins.vanniktech.publish)
 }
 
+/**
+ * Convenience aggregate: pulls in [lens-core], [lens-ui], [lens-ktor], and (Android/desktop only)
+ * [lens-okhttp]. For smaller binaries or clearer boundaries, depend on the sub-artifacts directly.
+ */
 mavenPublishing {
     coordinates(
         groupId = "io.github.farhazulmullick",
         artifactId = "lens-logger",
-        version = "1.1.0"
+        version = "1.2.0-SNAPSHOT",
     )
-
     pom {
         name.set("Lens Logger")
         description.set(
-            "LensLogger is a Kotlin Multiplatform (KMP) library for Android and iOS " +
-                "that makes debugging network requests effortless. " +
-                "It automatically logs all Ktor network requests and responses, " +
-                "and provides a built-in UI to inspect these logs directly in your app."
+            "Kotlin Multiplatform library for debugging network requests with optional Ktor, OkHttp, and Compose UI modules."
         )
         inceptionYear.set("2025")
         url.set("https://github.com/farhazulMullick/Lens/")
@@ -51,69 +48,42 @@ kotlin {
     listOf(
         iosX64(),
         iosArm64(),
-        iosSimulatorArm64()
+        iosSimulatorArm64(),
     ).forEach {
         it.binaries.framework {
             baseName = "lensktorKit"
         }
     }
+
+    jvm("desktop")
+    androidTarget()
+
     sourceSets {
-        jvm("desktop")
         val desktopMain by getting
+
         commonMain.dependencies {
-            implementation(libs.kotlin.stdlib)
-            implementation(compose.material3)
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.ui)
-            implementation(compose.materialIconsExtended)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodel)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(libs.androidx.navigation)
-
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.logging)
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.ktor.client.serializer)
-            implementation(libs.ktor.json.serializer)
-            implementation(libs.napier)
-            implementation(libs.datastore.core)
-            implementation(libs.datastore.preferences)
+            api(project(":lens-core"))
+            api(project(":lens-ui"))
+            api(project(":lens-ktor"))
         }
-
-        commonTest {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
+        androidMain.dependencies {
+            api(project(":lens-okhttp"))
         }
-        androidMain.dependencies{}
-        iosMain.dependencies {}
-        desktopMain.dependencies {}
-
+        desktopMain.dependencies {
+            api(project(":lens-okhttp"))
+        }
     }
-
 }
 
 android {
     namespace = "io.github.farhazulmullick.lenslogger"
-    buildFeatures {
-        compose = true
-        dataBinding = true
-    }
-
     compileSdk = 35
-    defaultConfig {
-        minSdk = 23
-    }
+    defaultConfig { minSdk = 23 }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-
     kotlin {
-        androidTarget()
         jvmToolchain(17)
     }
 }

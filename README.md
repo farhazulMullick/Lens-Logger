@@ -10,9 +10,10 @@ This helps you quickly identify issues and monitor network activity during devel
 
 ## Features
 - ✨ Seamless integration with Ktor HTTP client
+- 🔌 OkHttp application interceptor for Retrofit / raw `OkHttpClient` (Android and JVM desktop)
 - 📱 Works on both Android and iOS (KMP)
 - 🔍 Logs all network requests and responses
-- 🖥️ Built-in UI for real-time log inspection
+- 🖥️ Built-in UI for real-time log inspection and mocking
 - 🛠️ Minimal setup and easy to use
 - ✨ DataStore Visualizer
 
@@ -38,6 +39,34 @@ Or add to your `libs.versions.toml`:
 lensLoggerVersion = "<version>"
 lens-logger = { module = "io.github.farhazulmullick:lens-logger", version.ref = "lensLoggerVersion" }
 ```
+
+### Publish to Maven Local (try in another project)
+
+From this repository root:
+
+```bash
+./gradlew publishToMavenLocal
+```
+
+Artifacts use `groupId` **`io.github.farhazulmullick`**, current `version` **`1.2.0-SNAPSHOT`** (see each module’s `build.gradle.kts` under `mavenPublishing { coordinates(...) }`). They are installed under `~/.m2/repository/io/github/farhazulmullick/`.
+
+**In a separate Android (or KMP) project**, add Maven Local and the dependency.
+
+`settings.gradle.kts` (top-level `dependencyManagement` / `pluginManagement` repositories, or `dependencyResolutionManagement.repositories`):
+
+```kotlin
+mavenLocal()
+```
+
+`app/build.gradle.kts` (or your shared `commonMain` source set for KMP):
+
+```kotlin
+dependencies {
+    implementation("io.github.farhazulmullick:lens-logger:1.2.0-SNAPSHOT")
+}
+```
+
+Your app must already use **Jetpack Compose** (and compatible Kotlin / Compose Compiler versions) because `lens-ui` is Compose-based. After changing the library, run `publishToMavenLocal` again and **Sync** / **Refresh dependencies** in the consumer so Gradle picks up the new snapshot.
 
 ## Usage
 
@@ -79,30 +108,77 @@ val client = HttpClient(engine) {
 
 ```
 
-### 2. Setup LensApp UI
+### 2. OkHttp / Retrofit (Android and JVM desktop)
 
-Simply wrap your app's root composable with `LensApp`. This will enable the LensLogger UI and log request/response in your app.
+Install **`LensOkHttpInterceptor`** on the **application** interceptor chain of the `OkHttpClient` you use with Retrofit (or any OkHttp-based API). The library exposes a small helper:
 
+```kotlin
+import io.github.farhazulmullick.lenslogger.plugin.network.installLensInterceptor
+import okhttp3.OkHttpClient
+
+val okHttpClient = OkHttpClient.Builder()
+    .installLensInterceptor()
+    // other interceptors, timeouts, etc.
+    .build()
+```
+
+Equivalent without the extension:
+
+```kotlin
+import io.github.farhazulmullick.lenslogger.plugin.network.LensOkHttpInterceptor
+
+OkHttpClient.Builder()
+    .addInterceptor(LensOkHttpInterceptor())
+    .build()
+```
+
+Calls made through this client appear in the same network log store as Ktor traffic, so they show up in the Lens inspector and respect the same mocking rules where applicable. The interceptor uses blocking work internally; keep it on clients that run network I/O off the main thread (typical for Retrofit).
+
+### 3. Lens UI — Compose root (`LensApp`)
+
+When your root UI is Compose, wrap your app with `LensApp`. That adds a draggable FAB that opens the bottom sheet inspector (`LensContent`). Pass `dataStores` if you use the DataStore tab.
 
 ```kotlin
 import io.github.farhazulmullick.lenslogger.ui.LensApp
 import androidx.compose.ui.Modifier
 
 LensApp(
-    modifier = Modifier.fillMaxSize(), 
-    // by default enabled, set to false to disable.
+    modifier = Modifier.fillMaxSize(),
     showLensFAB = true,
-    // Optional: For DataStore Visualizer
-    dataStores = listOf(DataStores<Preferences>) 
+    sheetGesturesEnabled = false,
+    dataStores = myDataStores,
 ) {
-    // Your app content goes here
     App()
 }
 ```
 
-This will display your app content and allow you to open the LensLogger UI overlay for network log inspection.
+There is **no** separate window-level `ComposeView` overlay on activities: the FAB lives in your Compose tree only.
 
-> **Note:** Make sure you have set up LensLogger with your Ktor client as shown above in your network module.
+> **Note:** Wire at least one of **Ktor** (step 1) or **OkHttp** (step 2) so the Network tab has traffic to show.
+
+### 4. Android without a Compose root (`LensAndroid`)
+
+If you do **not** have a single Compose root (classic `Activity` / XML / fragments), skip `LensApp` and call **`LensAndroid.install`** once from **`Application.onCreate`** on the main thread. That posts a **persistent notification** that opens **`LensActivity`** (full-screen inspector). Configuration only needs a **`dataStoresProvider`** (return an empty list if you do not use DataStore in Lens).
+
+```kotlin
+import android.app.Application
+import io.github.farhazulmullick.lenslogger.ui.LensAndroid
+import io.github.farhazulmullick.lenslogger.ui.LensInstallConfiguration
+
+class MyApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        LensAndroid.install(
+            this,
+            LensInstallConfiguration(dataStoresProvider = { ctx -> emptyList() }),
+        )
+    }
+}
+```
+
+Register the application class in the manifest (`android:name=".MyApp"`). Call **`LensAndroid.uninstall(this)`** with the same `Application` to cancel the notification and clear cached DataStores. After the user grants **`POST_NOTIFICATIONS`** (API 33+), call **`LensAndroid.refreshPersistentNotification(application)`** if the notification was not shown at install time.
+
+**iOS:** use your own navigation to embed or present the shared inspector UI as needed; the notification-based entry point is Android-only.
 
 ## License
 

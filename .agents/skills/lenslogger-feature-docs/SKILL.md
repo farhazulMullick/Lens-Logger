@@ -22,7 +22,7 @@ When a user asks to add or change a LensLogger feature, update the relevant GitH
 - Keep the collapsible, grouped outline on reference-style pages. Include the new page or section there, set `aria-current="page"` on its active navigation item, and keep page-section links aligned with real element IDs.
 - For a new standalone guide, update the global navigation and relevant guide groups on all existing documentation pages, the landing/showcase links, and the root `README.md`. Use relative links so the static site works at the GitHub Pages project path.
 - Keep screenshots and other page assets under `docs/assets/`. The Pages workflow publishes `docs/` as a static site; avoid adding a build step unless the user asks for one.
-- Use Lucide icons for navigation and small visual cues. Each page loads the pinned Lucide `1.77.0` UMD build, then initializes it with `docs/icons.js`. Keep text labels visible, mark decorative icons `aria-hidden="true"`, and verify icon names against Lucide. Do not add emoji or a second icon library for the same UI.
+- Use Lucide icons for navigation and small visual cues. Each page loads the pinned Lucide `1.77.0` UMD build, then initializes it with `docs/icons.js`. Keep leading and trailing icons aligned with the shared `.doc-icon` and `.trailing-icon` styles; use arrow icons for UI navigation cues rather than typed arrow glyphs. Keep text labels visible, mark decorative icons `aria-hidden="true"`, and verify icon names against Lucide. Do not add emoji or a second icon library for the same UI.
 - Preserve mobile behavior: the top navigation can scroll horizontally, and outline groups collapse on compact screens through `docs/reference.js`.
 
 ## Finish the update

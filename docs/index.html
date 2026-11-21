@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f5fc">
+  <meta name="description" content="Complete LensLogger documentation for installation, Ktor, OkHttp, Compose, Android, and network mocking.">
+  <script src="theme-init.js"></script>
+  <title>Documentation · LensLogger</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="reference.css">
+  <link rel="stylesheet" href="navigation.css">
+  <link rel="stylesheet" href="themes.css">
+</head>
+<body class="reference-page">
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="LensLogger guide home"><span class="brand-mark">L</span><span>LensLogger<span class="brand-muted"> / Docs</span></span></a>
+    <nav class="top-links" aria-label="Documentation navigation"><a href="index.html" aria-current="page"><i class="doc-icon" data-lucide="book-open" aria-hidden="true"></i>Setup &amp; API</a><a href="network.html"><i class="doc-icon" data-lucide="activity" aria-hidden="true"></i>Network</a><a href="mocking.html"><i class="doc-icon" data-lucide="shuffle" aria-hidden="true"></i>Mocking</a><a href="datastore.html"><i class="doc-icon" data-lucide="database" aria-hidden="true"></i>DataStore</a><a href="https://github.com/farhazulMullick/Lens-Logger"><i class="doc-icon" data-lucide="github" aria-hidden="true"></i>GitHub</a></nav>
+    <button class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode"><i class="doc-icon" data-lucide="moon" aria-hidden="true"></i><span>Dark</span></button>
+  </header>
+
+  <div class="reference-layout">
+    <aside class="outline" aria-label="Documentation navigation and page outline">
+      <p class="outline-label">LENSLOGGER DOCS</p>
+      <details open><summary><i class="doc-icon" data-lucide="library" aria-hidden="true"></i>Library</summary><a href="#overview">Overview</a><a href="#features">Features</a><a href="#demo">Demo</a></details>
+      <details open><summary><i class="doc-icon" data-lucide="settings-2" aria-hidden="true"></i>Setup</summary><a href="#pages">GitHub Pages</a><a href="#installation">Installation</a><a href="#maven-local">Maven Local</a></details>
+      <details open><summary><i class="doc-icon" data-lucide="plug-zap" aria-hidden="true"></i>Integrations</summary><a href="#ktor">Ktor Client</a><a href="#okhttp">OkHttp / Retrofit</a><a href="#compose">Compose root</a><a href="#android">Android without Compose</a></details>
+      <details open><summary><i class="doc-icon" data-lucide="book-open-check" aria-hidden="true"></i>Guides</summary><a href="network.html">Network visualizer</a><a href="mocking.html">Mock response guide</a><a href="datastore.html">DataStore visualizer</a><a href="examples.html#results">Visual result examples</a></details>
+      <details open><summary><i class="doc-icon" data-lucide="book-bookmark" aria-hidden="true"></i>Reference</summary><a href="#license">License</a></details>
+    </aside>
+
+    <main class="reference-content">
+      <div class="reference-breadcrumb"><a href="index.html">LensLogger</a><span>/</span> Documentation</div>
+      <section id="overview" class="reference-hero">
+        <p class="eyebrow">KOTLIN MULTIPLATFORM LIBRARY</p><h1>LensLogger</h1>
+        <p>LensLogger is a Kotlin Multiplatform (KMP) library for Android, iOS, and Desktop that makes debugging network requests effortless. It automatically logs Ktor network requests and responses and provides a built-in UI to inspect these logs directly in your app.</p>
+        <div class="doc-badges"><span>MIT License</span><span>Android</span><span>iOS</span><span>Desktop</span></div>
+        <div class="reference-actions"><a class="button button-primary" href="#installation">Install LensLogger <i class="doc-icon trailing-icon" data-lucide="arrow-down" aria-hidden="true"></i></a><a class="button button-soft" href="mocking.html">Explore mocking guide <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a></div>
+      </section>
+
+      <section id="features" class="reference-section"><p class="eyebrow">CAPABILITIES</p><h2>Features</h2>
+        <ul class="feature-list"><li>Seamless integration with Ktor HTTP client</li><li>OkHttp application interceptor for Retrofit and raw <code>OkHttpClient</code> (Android and JVM Desktop)</li><li>Works on Android and iOS (KMP), with Desktop support</li><li>Logs network requests and responses</li><li>Built-in UI for real-time log inspection and mocking</li><li>Minimal setup and easy to use</li><li><a href="datastore.html">DataStore Visualizer guide <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a></li></ul>
+      </section>
+
+      <section id="demo" class="reference-section"><p class="eyebrow">SEE IT IN ACTION</p><h2>Demo</h2>
+        <div class="demo-grid">
+          <figure><img src="assets/android_logger_demo.gif" loading="lazy" alt="LensLogger running on Android"><figcaption><b>Android</b><span>Network inspector</span></figcaption></figure>
+          <figure><img src="assets/ios_logger_demo.gif" loading="lazy" alt="LensLogger running on iOS"><figcaption><b>iOS</b><span>Network inspector</span></figcaption></figure>
+          <figure class="demo-desktop"><img src="assets/desktop_logger_demo.gif" loading="lazy" alt="LensLogger running on Windows Desktop"><figcaption><b>Desktop</b><span>Windows network inspector</span></figcaption></figure>
+          <figure><img src="assets/datastore_demo.gif" loading="lazy" alt="LensLogger DataStore visualizer"><figcaption><b>DataStore</b><span>Key and value inspection</span></figcaption></figure>
+        </div>
+        <a class="inline-link" href="network.html">Read the Network Visualizer guide <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><br><a class="inline-link" href="mocking.html">Read the Network Mocking guide <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><br><a class="inline-link" href="examples.html#workflow">Browse the visual walkthrough <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a>
+      </section>
+
+      <section id="pages" class="reference-section"><p class="eyebrow">PUBLISH THE GUIDE</p><h2>GitHub Pages</h2>
+        <p>The static documentation site is stored in <code>docs/</code>. The repository's Pages workflow deploys it after documentation changes reach <code>main</code>.</p>
+        <p>In the repository settings, open <strong>Settings → Pages</strong> and set the build and deployment source to <strong>GitHub Actions</strong>. After the first successful workflow run, GitHub displays the published URL in the Pages settings panel.</p>
+      </section>
+
+      <section id="installation" class="reference-section"><p class="eyebrow">GET STARTED</p><h2>Installation</h2>
+        <p>Add the LensLogger artifact to your module's <code>commonMain</code> dependencies:</p>
+        <pre><code>dependencies {
+    implementation("io.github.farhazulmullick:lens-logger:&lt;version&gt;")
+}</code></pre>
+        <p>Or add it to your <code>libs.versions.toml</code>:</p>
+        <pre><code>lensLoggerVersion = "&lt;version&gt;"
+lens-logger = { module = "io.github.farhazulmullick:lens-logger", version.ref = "lensLoggerVersion" }</code></pre>
+      </section>
+
+      <section id="maven-local" class="reference-section"><p class="eyebrow">LOCAL DEVELOPMENT</p><h2>Publish to Maven Local</h2>
+        <p>To try local library changes in another project, publish the artifacts from the repository root:</p>
+        <pre><code>./gradlew publishToMavenLocal</code></pre>
+        <p>Artifacts use group ID <code>io.github.farhazulmullick</code> and the current version <code>1.2.0-SNAPSHOT</code> (see each module's <code>build.gradle.kts</code> under <code>mavenPublishing { coordinates(...) }</code>). They are installed under <code>~/.m2/repository/io/github/farhazulmullick/</code>.</p>
+        <p>In the separate Android or KMP project, add Maven Local to repositories in the top-level <code>settings.gradle.kts</code> (for example, in <code>dependencyResolutionManagement.repositories</code>):</p>
+        <pre><code>mavenLocal()</code></pre>
+        <p>Then add the snapshot dependency to <code>app/build.gradle.kts</code> or your shared <code>commonMain</code> source set:</p>
+        <pre><code>dependencies {
+    implementation("io.github.farhazulmullick:lens-logger:1.2.0-SNAPSHOT")
+}</code></pre>
+        <div class="doc-note"><b>Compose requirement</b><p>Your app must already use Jetpack Compose (and compatible Kotlin / Compose Compiler versions) because <code>lens-ui</code> is Compose-based. After changing the library, run <code>publishToMavenLocal</code> again and sync or refresh dependencies in the consumer so Gradle picks up the new snapshot.</p></div>
+      </section>
+
+      <section id="usage" class="reference-section"><p class="eyebrow">INTEGRATION</p><h2>Usage</h2>
+        <article id="ktor" class="usage-block"><div class="usage-heading"><span>01</span><div><h3>Integrate with Ktor Client</h3><p>In shared code, such as <code>commonMain</code>:</p></div></div>
+          <pre><code>import io.github.farhazulmullick.lenslogger.*
+import io.ktor.client.*
+import io.ktor.client.engine.*
+import io.ktor.client.plugins.logging.*
+
+val client = HttpClient(engine) {
+    // Replace install(Logging) with this.
+    // Log request/response in Logcat and Lens UI as well.
+    LensHttpLogger {
+        level = LogLevel.ALL
+        logger = object : Logger {
+            override fun log(message: String) {
+                Napier.d(message = message)
+            }
+        }
+    }.also {
+        // Set up Napier logger.
+        Napier.base(DebugAntilog())
+    }
+}</code></pre>
+          <p>Or install LensLogger only:</p>
+          <pre><code>val client = HttpClient(engine) {
+    install(LensHttpLogger) {
+        level = LogLevel.ALL
+    }
+}</code></pre>
+        </article>
+
+        <article id="okhttp" class="usage-block"><div class="usage-heading"><span>02</span><div><h3>OkHttp / Retrofit (Android and JVM desktop)</h3><p>Install <code>LensOkHttpInterceptor</code> on the application interceptor chain of the <code>OkHttpClient</code> used by Retrofit or another OkHttp client.</p></div></div>
+          <pre><code>import io.github.farhazulmullick.lenslogger.plugin.network.installLensInterceptor
+import okhttp3.OkHttpClient
+
+val okHttpClient = OkHttpClient.Builder()
+    .installLensInterceptor()
+    // other interceptors, timeouts, etc.
+    .build()</code></pre>
+          <p>Equivalent without the extension:</p>
+          <pre><code>import io.github.farhazulmullick.lenslogger.plugin.network.LensOkHttpInterceptor
+
+OkHttpClient.Builder()
+    .addInterceptor(LensOkHttpInterceptor())
+    .build()</code></pre>
+          <p>Calls through this client appear in the same network log store as Ktor traffic, so they show up in the Lens inspector and respect the same mocking rules where applicable. The interceptor uses blocking work internally; keep it on clients that run network I/O off the main thread (typical for Retrofit).</p>
+        </article>
+
+        <article id="compose" class="usage-block"><div class="usage-heading"><span>03</span><div><h3>Lens UI — Compose root (<code>LensApp</code>)</h3><p>When your root UI is Compose, wrap your app with <code>LensApp</code>. It adds a draggable FAB that opens the bottom sheet inspector (<code>LensContent</code>). Pass <code>dataStores</code> if you use the DataStore tab.</p></div></div>
+          <pre><code>import io.github.farhazulmullick.lenslogger.ui.LensApp
+import androidx.compose.ui.Modifier
+
+LensApp(
+    modifier = Modifier.fillMaxSize(),
+    showLensFAB = true,
+    sheetGesturesEnabled = false,
+    dataStores = myDataStores,
+) {
+    App()
+}</code></pre>
+          <div class="doc-note"><b>Compose integration</b><p>There is no separate window-level <code>ComposeView</code> overlay on activities: the FAB lives in your Compose tree only. Wire at least one of Ktor or OkHttp so the Network tab has traffic to show.</p></div>
+        </article>
+
+        <article id="android" class="usage-block"><div class="usage-heading"><span>04</span><div><h3>Android without a Compose root (<code>LensAndroid</code>)</h3><p>If you do not have a single Compose root (classic Activity, XML, or fragments), skip <code>LensApp</code>. Call <code>LensAndroid.install</code> once from <code>Application.onCreate</code> on the main thread. It posts a persistent notification that opens <code>LensActivity</code> (full-screen inspector). Configuration only needs a <code>dataStoresProvider</code> (return an empty list if you do not use DataStore in Lens).</p></div></div>
+          <pre><code>import android.app.Application
+import io.github.farhazulmullick.lenslogger.ui.LensAndroid
+import io.github.farhazulmullick.lenslogger.ui.LensInstallConfiguration
+
+class MyApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        LensAndroid.install(
+            this,
+            LensInstallConfiguration(dataStoresProvider = { ctx -&gt; emptyList() }),
+        )
+    }
+}</code></pre>
+          <p>Register the application class in the manifest (<code>android:name=".MyApp"</code>). Call <code>LensAndroid.uninstall(this)</code> with the same Application to cancel the notification and clear cached DataStores. After the user grants <code>POST_NOTIFICATIONS</code> (API 33+), call <code>LensAndroid.refreshPersistentNotification(application)</code> if the notification was not shown at install time.</p>
+          <div class="doc-note"><b>iOS</b><p>Use your own navigation to embed or present the shared inspector UI as needed; the notification-based entry point is Android-only.</p></div>
+        </article>
+      </section>
+
+      <section id="license" class="reference-section"><p class="eyebrow">OPEN SOURCE</p><h2>License</h2><p>This project is licensed under the MIT License. <a class="inline-link" href="https://github.com/farhazulMullick/Lens-Logger/blob/main/LICENSE">Read the license <i class="doc-icon trailing-icon" data-lucide="external-link" aria-hidden="true"></i></a></p></section>
+      <footer class="reference-footer"><span>LensLogger documentation</span><a href="network.html">Network visualizer <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="mocking.html">Mock response guide <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="datastore.html">DataStore visualizer <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="https://lucide.dev/">Icons by Lucide <i class="doc-icon trailing-icon" data-lucide="external-link" aria-hidden="true"></i></a><a href="https://github.com/farhazulMullick/Lens-Logger">GitHub <i class="doc-icon trailing-icon" data-lucide="external-link" aria-hidden="true"></i></a></footer>
+    </main>
+  </div>
+  <script src="https://unpkg.com/lucide@1.77.0/dist/umd/lucide.min.js"></script>
+  <script src="icons.js"></script>
+  <script src="theme.js"></script>
+  <script src="reference.js"></script>
+</body>
+</html>

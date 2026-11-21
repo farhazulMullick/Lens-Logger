@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f5fc">
+  <meta name="description" content="Learn how to connect your Preferences DataStore to LensLogger and inspect or edit stored values in the DataStore tab.">
+  <script src="theme-init.js"></script>
+  <title>Visualize DataStore · LensLogger</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="reference.css">
+  <link rel="stylesheet" href="navigation.css">
+  <link rel="stylesheet" href="themes.css">
+</head>
+<body class="reference-page">
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="LensLogger guide home"><span class="brand-mark">L</span><span>LensLogger<span class="brand-muted"> / Docs</span></span></a>
+    <nav class="top-links" aria-label="Documentation navigation"><a href="index.html"><i class="doc-icon" data-lucide="book-open" aria-hidden="true"></i>Setup &amp; API</a><a href="network.html"><i class="doc-icon" data-lucide="activity" aria-hidden="true"></i>Network</a><a href="mocking.html"><i class="doc-icon" data-lucide="shuffle" aria-hidden="true"></i>Mocking</a><a href="datastore.html" aria-current="page"><i class="doc-icon" data-lucide="database" aria-hidden="true"></i>DataStore</a><a href="https://github.com/farhazulMullick/Lens-Logger"><i class="doc-icon" data-lucide="github" aria-hidden="true"></i>GitHub</a></nav>
+    <button class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode"><i class="doc-icon" data-lucide="moon" aria-hidden="true"></i><span>Dark</span></button>
+  </header>
+
+  <div class="reference-layout">
+    <aside class="outline" aria-label="Documentation navigation and DataStore outline">
+      <p class="outline-label">LENSLOGGER DOCS</p>
+      <details open><summary><i class="doc-icon" data-lucide="settings-2" aria-hidden="true"></i>Setup</summary><a href="index.html">Overview &amp; API</a><a href="index.html#installation">Installation</a><a href="index.html#ktor">Integrations</a></details>
+      <details open><summary><i class="doc-icon" data-lucide="chart-no-axes-column-increasing" aria-hidden="true"></i>Visualizers</summary><a href="network.html">Network visualizer</a><a class="active" href="datastore.html" aria-current="page">DataStore visualizer</a></details>
+      <details open><summary><i class="doc-icon" data-lucide="shuffle" aria-hidden="true"></i>Network tools</summary><a href="mocking.html">Mock response guide</a><a href="examples.html#results">Visual result examples</a></details>
+      <p class="outline-label outline-subhead">ON THIS PAGE</p>
+      <a href="#overview">Overview</a><a href="#connect">Connect a DataStore</a><a href="#compose">Compose setup</a><a href="#android">Android setup</a><a href="#inspect">Inspect values</a><a href="#edit">Edit values</a><a href="#troubleshoot">Troubleshooting</a>
+    </aside>
+
+    <main class="reference-content">
+      <div class="reference-breadcrumb"><a href="index.html">Documentation</a><span>/</span> DataStore Visualizer</div>
+      <section id="overview" class="reference-hero">
+        <p class="eyebrow">DATASTORE VISUALIZER</p><h1>See what your app stores.</h1>
+        <p>Pass your Preferences DataStore instance to LensLogger to inspect its saved keys and values from the in-app DataStore tab. You can also edit displayed values and save them back to the same store.</p>
+        <div class="reference-actions"><a class="button button-primary" href="#connect">Connect a DataStore <i class="doc-icon trailing-icon" data-lucide="arrow-down" aria-hidden="true"></i></a><a class="button button-soft" href="index.html">Full documentation <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a></div>
+      </section>
+
+      <section id="connect" class="reference-section"><p class="eyebrow">STEP 01</p><h2>Pass the DataStore your app uses</h2>
+        <p>LensLogger expects one or more <code>DataStore&lt;Preferences&gt;</code> instances. Pass the same instance or instances your application reads and writes. The visualizer reads the current stored preference entries; it does not create a DataStore for your app.</p>
+        <div class="doc-note"><b>Preferences DataStore</b><p>This API is typed for <code>DataStore&lt;Preferences&gt;</code>. The guide does not cover Proto DataStore, which uses a different data type.</p></div>
+      </section>
+
+      <section id="compose" class="reference-section"><p class="eyebrow">COMPOSE ROOT</p><h2>Connect it with <code>LensApp</code></h2>
+        <p>When using LensLogger in a Compose app, provide the store list through the <code>dataStores</code> parameter. Keep your DataStore instance in the app's existing dependency or state setup, then pass it to the Compose root.</p>
+        <pre><code>import androidx.compose.runtime.Composable
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import io.github.farhazulmullick.lenslogger.ui.LensApp
+
+@Composable
+fun AppRoot(settingsStore: DataStore&lt;Preferences&gt;) {
+    LensApp(
+        showLensFAB = true,
+        dataStores = listOf(settingsStore),
+    ) {
+        AppContent()
+    }
+}</code></pre>
+        <p>To inspect more than one Preferences DataStore, pass them together:</p>
+        <pre><code>dataStores = listOf(settingsStore, accountStore)</code></pre>
+      </section>
+
+      <section id="android" class="reference-section"><p class="eyebrow">ANDROID WITHOUT A COMPOSE ROOT</p><h2>Provide it to <code>LensAndroid</code></h2>
+        <p>For the notification-based Android inspector, return the DataStore instances from <code>LensInstallConfiguration.dataStoresProvider</code>. Resolve them from the application context and provide the same app stores.</p>
+        <pre><code>import android.app.Application
+import io.github.farhazulmullick.lenslogger.ui.LensAndroid
+import io.github.farhazulmullick.lenslogger.ui.LensInstallConfiguration
+
+class MyApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        LensAndroid.install(
+            this,
+            LensInstallConfiguration(
+                dataStoresProvider = { appContext -&gt;
+                    listOf(settingsDataStore(appContext))
+                },
+            ),
+        )
+    }
+}</code></pre>
+        <p><code>settingsDataStore(appContext)</code> represents your app's existing DataStore provider. If you do not use DataStore, the provider can return <code>emptyList()</code>. See the <a class="inline-link" href="index.html#android">full Android setup</a> for manifest registration and notification details.</p>
+      </section>
+
+      <section id="inspect" class="reference-section"><p class="eyebrow">STEP 02</p><h2>Open the DataStore tab</h2>
+        <ol class="doc-steps"><li>Run your app and open the Lens FAB.</li><li>Select the <strong>DataStore</strong> tab in the Lens inspector.</li><li>Review the displayed preference keys, their types, and current values.</li></ol>
+        <figure class="datastore-demo"><img src="assets/datastore_demo.gif" loading="lazy" alt="LensLogger DataStore visualizer showing stored preference entries"><figcaption>DataStore visualizer example</figcaption></figure>
+      </section>
+
+      <section id="edit" class="reference-section"><p class="eyebrow">STEP 03 · OPTIONAL</p><h2>Edit and save a value</h2>
+        <ol class="doc-steps"><li>Tap a displayed value and enter the replacement.</li><li>Tap the check icon, or move focus away from the field, to save.</li><li>LensLogger writes the value to that DataStore and shows a confirmation message when the update succeeds.</li></ol>
+        <p>Supported preference types are <code>Int</code>, <code>Long</code>, <code>Float</code>, <code>Double</code>, <code>String</code>, and <code>Boolean</code>. Enter a value that matches the displayed type. The edit applies to the actual DataStore used by the app, so the app may observe and react to the change.</p>
+        <div class="doc-note"><b>Use development data</b><p>Editing in the visualizer changes the app's stored value. Use a development or test account when changing values that could affect app behavior.</p></div>
+      </section>
+
+      <section id="troubleshoot" class="reference-section"><p class="eyebrow">TROUBLESHOOTING</p><h2>If the tab is empty</h2>
+        <ul class="feature-list troubleshooting-list"><li><strong>No DataStore files found:</strong> confirm a non-empty list of Preferences DataStores is passed to LensLogger.</li><li><strong>No data found:</strong> the provided DataStore may not have any saved preference entries yet.</li><li><strong>Values do not update:</strong> pass the same DataStore instance the app uses, and make sure the edit matches the displayed type.</li><li><strong>Compose integration:</strong> verify <code>dataStores</code> is passed to <code>LensApp</code>.</li><li><strong>Android notification integration:</strong> return the stores from <code>dataStoresProvider</code>.</li></ul>
+      </section>
+
+      <footer class="reference-footer"><span>LensLogger DataStore guide</span><a href="index.html">Full documentation <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="mocking.html">Network mocks <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="https://lucide.dev/">Icons by Lucide <i class="doc-icon trailing-icon" data-lucide="external-link" aria-hidden="true"></i></a><a href="https://github.com/farhazulMullick/Lens-Logger">GitHub <i class="doc-icon trailing-icon" data-lucide="external-link" aria-hidden="true"></i></a></footer>
+    </main>
+  </div>
+  <script src="https://unpkg.com/lucide@1.77.0/dist/umd/lucide.min.js"></script>
+  <script src="icons.js"></script>
+  <script src="theme.js"></script>
+  <script src="reference.js"></script>
+</body>
+</html>

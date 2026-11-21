@@ -16,6 +16,15 @@ This helps you quickly identify issues and monitor network activity during devel
 - 🖥️ Built-in UI for real-time log inspection and mocking
 - 🛠️ Minimal setup and easy to use
 - ✨ DataStore Visualizer
+- ✨ Mock response
+
+## Documentation
+
+- [Setup & API](docs/index.html): installation, Ktor / OkHttp setup, Lens UI integration, and Android setup.
+- [Network Visualizer](docs/network.html): inspect captured requests and responses.
+- [Network Mocking](docs/mocking.html): configure and replay mock responses.
+- [DataStore Visualizer](docs/datastore.html): inspect Preferences DataStore.
+- [Mock result examples](docs/examples.html): screenshot walkthrough of successful and failed mock results.
 
 ## Demo
 

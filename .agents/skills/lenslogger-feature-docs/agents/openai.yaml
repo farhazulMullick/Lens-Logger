@@ -1,0 +1,3 @@
+interface:
+  display_name: "LensLogger Feature Docs"
+  short_description: "Keep LensLogger feature docs and navigation in sync"

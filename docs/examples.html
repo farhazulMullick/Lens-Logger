@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f5fc">
+  <meta name="description" content="A visual guide to mocking network responses with LensLogger: create response rules, replay requests, and inspect simulated failures.">
+  <script src="theme-init.js"></script>
+  <title>Mocking network results · LensLogger</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="reference.css">
+  <link rel="stylesheet" href="navigation.css">
+  <link rel="stylesheet" href="themes.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="LensLogger docs home"><span class="brand-mark">L</span><span>LensLogger<span class="brand-muted"> / Guides</span></span></a>
+    <nav class="top-links" aria-label="Main navigation">
+      <a href="index.html"><i class="doc-icon" data-lucide="book-open" aria-hidden="true"></i>Setup &amp; API</a><a href="network.html"><i class="doc-icon" data-lucide="activity" aria-hidden="true"></i>Network</a><a href="mocking.html"><i class="doc-icon" data-lucide="shuffle" aria-hidden="true"></i>Mocking guide</a><a href="#results" aria-current="page"><i class="doc-icon" data-lucide="images" aria-hidden="true"></i>Examples</a><a href="datastore.html"><i class="doc-icon" data-lucide="database" aria-hidden="true"></i>DataStore</a><a href="https://github.com/farhazulMullick/Lens-Logger"><i class="doc-icon" data-lucide="github" aria-hidden="true"></i>GitHub</a>
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode"><i class="doc-icon" data-lucide="moon" aria-hidden="true"></i><span>Dark</span></button>
+  </header>
+
+  <main id="top">
+    <section class="hero wrap">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-dot"></span> VISUAL GUIDE <span class="eyebrow-divider">/</span> NETWORK MOCKS</p>
+        <h1>Shape the response.<br><span>Keep the app moving.</span></h1>
+        <p class="hero-lede">Use LensLogger to turn a captured request into a repeatable response, slow a call down, or make it fail on purpose. Then replay it and see what your app does.</p>
+        <a class="button button-primary" href="#workflow">Explore the workflow <i class="doc-icon trailing-icon" data-lucide="arrow-down" aria-hidden="true"></i></a>
+        <div class="hero-meta"><span class="meta-icon">⌁</span> A field guide to response mocking <span class="meta-sep">·</span> Android, iOS &amp; Desktop</div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
+        <div class="hero-phone"><img src="assets/mock-result-success.png" alt="LensLogger playground showing a successful mocked response with status 201 and a JSON body"></div>
+        <div class="float-card float-top"><span class="float-check">✓</span><div><b>201 Created</b><small>Response delivered</small></div></div>
+        <div class="float-card float-bottom"><span class="float-pulse"></span><div><b>Mock active</b><small>POST · /posts</small></div></div>
+      </div>
+    </section>
+
+    <section class="intro-strip"><div class="wrap strip-inner"><span class="strip-label">THE IDEA</span><p>A mock is a rule that matches a request and supplies a response locally, so you can test consumer behavior without relying on the live service.</p><i class="doc-icon strip-arrow" data-lucide="arrow-down-right" aria-hidden="true"></i></div></section>
+
+    <nav class="chapter-outline wrap" aria-label="Mocking guide outline"><span>IN THIS GUIDE</span><a href="#workflow">Workflow</a><a href="#results">Mock results</a><a href="#matching">Matching rules</a></nav>
+
+    <section class="section wrap" id="workflow">
+      <div class="section-heading">
+        <div><p class="eyebrow">01 <span class="eyebrow-divider">/</span> THE WORKFLOW</p><h2>From captured call<br>to controlled result.</h2></div>
+        <p class="section-summary">Start with a real request in the Network tab. LensLogger carries its URL, method, response body, status, and headers into a new rule so you can adjust only what you need.</p>
+      </div>
+
+      <article class="step-card step-featured">
+        <div class="step-copy"><div class="step-index">01</div><div><h3>Find a request</h3><p>Open the Lens FAB and choose <strong>Network</strong>. Search by endpoint, then tap a request to inspect its details.</p><p class="step-note">A successful request shows its status, endpoint, transfer sizes, and elapsed time.</p></div></div>
+        <button class="shot shot-large" data-lightbox="assets/network-log.png" aria-label="Enlarge screenshot: Network request list"><img src="assets/network-log.png" loading="lazy" alt="Network tab with a successful POST /posts request"></button>
+      </article>
+
+      <div class="step-grid">
+        <article class="step-card">
+          <div class="step-copy"><div class="step-index">02</div><div><h3>Inspect the response</h3><p>Switch to <strong>Response</strong> to check the status, headers, and body before using it as a starting point.</p></div></div>
+          <button class="shot" data-lightbox="assets/response-details.png" aria-label="Enlarge screenshot: Response details"><img src="assets/response-details.png" loading="lazy" alt="Response detail view showing status 201, response headers, and JSON body"></button>
+        </article>
+        <article class="step-card">
+          <div class="step-copy"><div class="step-index">03</div><div><h3>Set the response</h3><p>Tap <strong>Mock this</strong>. Edit the JSON body or response headers, then create the rule.</p><p class="step-note">You can also add a rule from the Mocks tab with the plus button.</p></div></div>
+          <button class="shot" data-lightbox="assets/mock-response-editor.png" aria-label="Enlarge screenshot: Mock response editor"><img src="assets/mock-response-editor.png" loading="lazy" alt="New mock editor showing response headers and JSON body fields"></button>
+        </article>
+      </div>
+
+      <article class="step-card step-wide">
+        <div class="step-copy"><div class="step-index">04</div><div><h3>Enable and replay</h3><p>Keep the rule enabled, then make the same request again. The app receives your configured status, headers, and body.</p><p class="step-note">Matches use the full URL exactly. HTTP method comparison ignores case.</p></div></div>
+        <div class="shot-pair">
+          <button class="shot" data-lightbox="assets/mock-rules-list.png" aria-label="Enlarge screenshot: Mocks list"><img src="assets/mock-rules-list.png" loading="lazy" alt="Mocks tab listing an enabled POST rule for the posts endpoint"></button>
+          <button class="shot" data-lightbox="assets/mock-result-updated.png" aria-label="Enlarge screenshot: Updated consumer response"><img src="assets/mock-result-updated.png" loading="lazy" alt="Playground showing the consumer received a mocked response body"></button>
+        </div>
+      </article>
+    </section>
+
+    <section class="results-section" id="results">
+      <div class="wrap">
+        <div class="section-heading results-heading">
+          <div><p class="eyebrow">02 <span class="eyebrow-divider">/</span> MOCK RESULTS</p><h2>Choose the behavior<br>you need to test.</h2></div>
+          <p class="section-summary">A good mock result is visible both where you configure it and where your app consumes it. These examples show success, failure, and request history.</p>
+        </div>
+
+        <div class="result-grid">
+          <article class="result-card result-success">
+            <div class="result-label"><span class="result-icon">✓</span><span>SUCCESS RESPONSE</span></div>
+            <h3>Return a predictable payload</h3>
+            <p>Set the response body and status code your screen expects. Replay the call and verify the consumer renders the new data.</p>
+            <div class="result-tags"><span>201 Created</span><span>JSON body</span></div>
+            <button class="shot" data-lightbox="assets/mock-result-updated.png" aria-label="Enlarge screenshot: Successful mocked consumer result"><img src="assets/mock-result-updated.png" loading="lazy" alt="Successful mocked result with status 201 and edited example body"></button>
+          </article>
+          <article class="result-card result-failure">
+            <div class="result-label"><span class="result-icon">!</span><span>SIMULATED FAILURE</span></div>
+            <h3>Exercise your error path</h3>
+            <p>Enable <strong>Simulate network failure</strong> to throw a synthetic I/O failure. Use it to check retry, empty-state, and error messaging.</p>
+            <div class="result-tags"><span>Failure mode</span><span>Configurable delay</span></div>
+            <button class="shot" data-lightbox="assets/mock-result-failure.png" aria-label="Enlarge screenshot: Simulated network failure"><img src="assets/mock-result-failure.png" loading="lazy" alt="Playground showing a request failed alert for the simulated POST /posts failure"></button>
+          </article>
+        </div>
+
+        <div class="detail-grid">
+          <article class="detail-card"><div class="detail-copy"><p class="eyebrow">RULE CONTROLS</p><h3>One endpoint.<br>Different scenarios.</h3><p>Rules can be enabled or disabled from the Mocks list, edited, or deleted. Add a response delay in milliseconds to exercise loading states.</p></div><div class="shot-pair"><button class="shot" data-lightbox="assets/mock-failure-editor.png" aria-label="Enlarge screenshot: Failure mock configuration"><img src="assets/mock-failure-editor.png" loading="lazy" alt="Mock editor with network failure enabled and request matching fields"></button><button class="shot" data-lightbox="assets/failure-rule-list.png" aria-label="Enlarge screenshot: Failure rule in the Mocks list"><img src="assets/failure-rule-list.png" loading="lazy" alt="Mocks list showing a disabled 201 rule and an enabled failing POST rule"></button></div></article>
+          <article class="detail-card"><div class="detail-copy"><p class="eyebrow">VISIBLE IN HISTORY</p><h3>Spot the mocked call.</h3><p>Mocked network entries carry a <strong>MOCK</strong> badge. Compare them with earlier live calls to see how the consumer result changed.</p><div class="legend"><span><i class="legend-mock"></i>Mocked</span><span><i class="legend-live"></i>Live request</span></div></div><button class="shot" data-lightbox="assets/mocked-and-live-logs.png" aria-label="Enlarge screenshot: Mocked and live calls in history"><img src="assets/mocked-and-live-logs.png" loading="lazy" alt="Network history showing a mocked POST request above the earlier live POST request"></button></article>
+        </div>
+
+        <article class="history-card">
+          <div class="history-copy"><p class="eyebrow">REQUEST HISTORY</p><h3>Keep the full story in view.</h3><p>Network history can contain repeated mocked calls, live calls, and failures. Use the endpoint search to narrow the list and open any entry for details.</p><ul><li>MOCK badge identifies a rule response</li><li>Status and timing show the consumer outcome</li><li>Open the entry to inspect request and response data</li></ul></div>
+          <button class="shot" data-lightbox="assets/mock-requests-history.png" aria-label="Enlarge screenshot: Network history with several mocked requests"><img src="assets/mock-requests-history.png" loading="lazy" alt="Scrollable network request history with mock badges and successful responses"></button>
+        </article>
+      </div>
+    </section>
+
+    <section class="match-section wrap" id="matching">
+      <div class="match-icon">⌕</div><div><p class="eyebrow">MATCHING RULES</p><h2>Make the match deliberate.</h2><p>LensLogger selects the first enabled rule whose full request URL matches exactly and whose HTTP method matches without regard to case. Turn off a rule to let the request use its normal path again.</p></div>
+      <div class="match-code"><span class="code-label">MATCH</span><code>enabled<br>+ exact URL<br>+ same HTTP method</code><span class="code-result"><i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i> mock response</span></div>
+    </section>
+
+    <section class="cta-section"><div class="wrap cta-inner"><div><p class="eyebrow">READY TO TRY IT?</p><h2>Make the edge case<br>easy to repeat.</h2></div><div><p>Install LensLogger, capture a request, and create a rule for the behavior you want to see.</p><a class="button button-light" href="index.html#installation">Read installation guide <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a></div></div></section>
+  </main>
+
+  <footer class="footer"><div class="wrap footer-inner"><a class="brand" href="#top"><span class="brand-mark">L</span><span>LensLogger</span></a><span>Made for curious debugging.</span><a href="network.html">Network visualizer <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="mocking.html">Mocking guide <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="datastore.html">DataStore guide <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="index.html">Setup &amp; API <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="https://lucide.dev/">Icons by Lucide <i class="doc-icon trailing-icon" data-lucide="external-link" aria-hidden="true"></i></a><a href="https://github.com/farhazulMullick/Lens-Logger">GitHub <i class="doc-icon trailing-icon" data-lucide="external-link" aria-hidden="true"></i></a></div></footer>
+
+  <dialog class="lightbox" aria-label="Screenshot preview"><button class="lightbox-close" aria-label="Close image preview">×</button><img src="" alt=""></dialog>
+  <script src="https://unpkg.com/lucide@1.77.0/dist/umd/lucide.min.js"></script>
+  <script src="icons.js"></script>
+  <script src="theme.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

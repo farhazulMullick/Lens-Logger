@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f5fc">
+  <meta name="description" content="Create LensLogger mock rules, define response data, simulate network failures, and replay requests in your app.">
+  <script src="theme-init.js"></script>
+  <title>Mock Network Responses · LensLogger</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="reference.css">
+  <link rel="stylesheet" href="navigation.css">
+  <link rel="stylesheet" href="themes.css">
+</head>
+<body class="reference-page">
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="LensLogger guide home"><span class="brand-mark">L</span><span>LensLogger<span class="brand-muted"> / Docs</span></span></a>
+    <nav class="top-links" aria-label="Documentation navigation"><a href="index.html"><i class="doc-icon" data-lucide="book-open" aria-hidden="true"></i>Setup &amp; API</a><a href="network.html"><i class="doc-icon" data-lucide="activity" aria-hidden="true"></i>Network</a><a href="mocking.html" aria-current="page"><i class="doc-icon" data-lucide="shuffle" aria-hidden="true"></i>Mocking</a><a href="datastore.html"><i class="doc-icon" data-lucide="database" aria-hidden="true"></i>DataStore</a><a href="https://github.com/farhazulMullick/Lens-Logger"><i class="doc-icon" data-lucide="github" aria-hidden="true"></i>GitHub</a></nav>
+    <button class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode"><i class="doc-icon" data-lucide="moon" aria-hidden="true"></i><span>Dark</span></button>
+  </header>
+
+  <div class="reference-layout">
+    <aside class="outline" aria-label="Documentation navigation and mocking guide outline">
+      <p class="outline-label">LENSLOGGER DOCS</p>
+      <details open><summary><i class="doc-icon" data-lucide="settings-2" aria-hidden="true"></i>Setup</summary><a href="index.html">Overview &amp; API</a><a href="index.html#installation">Installation</a><a href="index.html#ktor">Ktor setup</a><a href="index.html#okhttp">OkHttp setup</a></details>
+      <details open><summary><i class="doc-icon" data-lucide="chart-no-axes-column-increasing" aria-hidden="true"></i>Visualizers</summary><a href="network.html">Network visualizer</a><a href="datastore.html">DataStore visualizer</a></details>
+      <details open><summary><i class="doc-icon" data-lucide="shuffle" aria-hidden="true"></i>Mocking guide</summary><a href="#overview">Overview</a><a href="#start">Start from a request</a><a href="#rule">Configure the rule</a><a href="#replay">Replay and inspect</a><a href="#failure">Simulate failures</a><a href="#matching">Matching behavior</a><a href="#troubleshoot">Troubleshooting</a></details>
+      <details open><summary><i class="doc-icon" data-lucide="images" aria-hidden="true"></i>Examples</summary><a href="examples.html#results">Visual mock results</a><a href="examples.html#workflow">Screenshot walkthrough</a></details>
+    </aside>
+
+    <main class="reference-content">
+      <div class="reference-breadcrumb"><a href="index.html">Documentation</a><span>/</span> Mock Network Responses</div>
+      <section id="overview" class="reference-hero">
+        <p class="eyebrow">NETWORK MOCKING</p><h1>Control the response your app sees.</h1>
+        <p>Create a mock rule from a captured call or add one from the Mocks tab. Match a request by its full URL and HTTP method, then return a custom status, headers, and body—or simulate a network failure.</p>
+        <div class="reference-actions"><a class="button button-primary" href="#start">Create a mock <i class="doc-icon trailing-icon" data-lucide="arrow-down" aria-hidden="true"></i></a><a class="button button-soft" href="examples.html#results">View result examples <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a></div>
+      </section>
+
+      <section id="start" class="reference-section"><p class="eyebrow">STEP 01</p><h2>Start with a captured request</h2>
+        <ol class="doc-steps"><li>Open the Lens FAB and go to the <strong>Network</strong> tab.</li><li>Find the request you want to replace, then tap it to inspect its details.</li><li>Choose <strong>Mock this</strong>. The editor starts with that request's URL and method and, when available, the captured response status, headers, and body.</li></ol>
+        <figure class="datastore-demo"><img src="assets/response-details.png" loading="lazy" alt="Network response detail with Mock this action"><figcaption>Inspect a captured response, then start a mock from this request</figcaption></figure>
+        <p>You can also open the <strong>Mocks</strong> tab and tap the plus button to create a rule manually.</p>
+      </section>
+
+      <section id="rule" class="reference-section"><p class="eyebrow">STEP 02</p><h2>Configure the rule</h2>
+        <p>Set the request match and the response the app should receive:</p>
+        <ul class="feature-list"><li><strong>Enabled:</strong> turn the rule on or off.</li><li><strong>URL:</strong> full request URL to match exactly.</li><li><strong>HTTP method:</strong> method to match; comparison ignores letter case.</li><li><strong>Response delay:</strong> time to wait before returning the result, in milliseconds.</li><li><strong>Status code:</strong> synthetic response status from 100 through 599.</li><li><strong>Response headers:</strong> add, edit, or remove header name/value pairs.</li><li><strong>Response body:</strong> response text returned to the app, often JSON.</li></ul>
+        <figure class="datastore-demo"><img src="assets/mock-response-editor.png" loading="lazy" alt="Mock response editor with response headers and JSON body"><figcaption>Editor opened from a captured request, with response headers and body prefilled</figcaption></figure>
+      </section>
+
+      <section id="replay" class="reference-section"><p class="eyebrow">STEP 03</p><h2>Save the rule and replay the call</h2>
+        <ol class="doc-steps"><li>Tap <strong>Create mock</strong>. The rule appears in the Mocks list.</li><li>Make the same request again from your app.</li><li>Check the screen or state that consumes the response, then open Network history to inspect the result.</li></ol>
+        <figure class="datastore-demo"><img src="assets/mock-rules-list.png" loading="lazy" alt="Mocks tab showing an enabled POST rule"><figcaption>Enabled rule in the Mocks tab</figcaption></figure>
+        <figure class="datastore-demo"><img src="assets/mock-result-updated.png" loading="lazy" alt="Consumer screen showing the mocked response body"><figcaption>The consumer receives the configured status and response body</figcaption></figure>
+        <p>Mocked calls are marked with a <strong>MOCK</strong> badge in the Network history. From the Mocks tab you can toggle a rule, edit it, or delete it.</p>
+      </section>
+
+      <section id="failure" class="reference-section"><p class="eyebrow">FAILURE AND LOADING STATES</p><h2>Simulate failures or slow responses</h2>
+        <p>Turn on <strong>Simulate network failure</strong> to make a matched request throw a synthetic I/O failure. Use this to exercise your app's retry, error, and empty-state behavior. Add a response delay to test loading indicators; the configured delay is applied before either a mock response or simulated failure.</p>
+        <p>When failure simulation is enabled, status, headers, and body fields are disabled because no response is produced.</p>
+        <div class="shot-pair">
+          <figure class="datastore-demo"><img src="assets/mock-failure-editor.png" loading="lazy" alt="Mock editor configured to simulate a network failure"><figcaption>Failure mode and request match</figcaption></figure>
+          <figure class="datastore-demo"><img src="assets/mock-result-failure.png" loading="lazy" alt="App showing a simulated request failure"><figcaption>Failure surfaced to the consumer</figcaption></figure>
+        </div>
+      </section>
+
+      <section id="matching" class="reference-section"><p class="eyebrow">HOW MATCHING WORKS</p><h2>Match the exact request</h2>
+        <p>A rule applies when it is enabled, the complete request URL equals the rule URL, and the HTTP method matches without regard to case. If there are multiple enabled rules with the same URL and method, the first matching rule is selected; keep only the scenario you want enabled for a given match.</p>
+        <div class="match-code"><span class="code-label">RULE MATCH</span><code>enabled<br>+ exact full URL<br>+ same HTTP method</code><span class="code-result"><i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i> synthetic result</span></div>
+        <p>Rules are saved locally by LensLogger and are available again when the app is reopened.</p>
+      </section>
+
+      <section id="troubleshoot" class="reference-section"><p class="eyebrow">TROUBLESHOOTING</p><h2>If the live response still appears</h2>
+        <ul class="feature-list troubleshooting-list"><li>Confirm the rule is enabled in the Mocks list.</li><li>Compare the rule URL to the full URL sent by the request, including scheme, host, path, and query string.</li><li>Check the HTTP method.</li><li>Make sure the request uses the Ktor or OkHttp client configured with LensLogger.</li><li>If you have duplicate enabled rules for the same URL and method, disable the rules for other scenarios.</li></ul>
+        <p>For help finding and inspecting calls, see the <a class="inline-link" href="network.html">Network Visualizer guide</a>.</p>
+      </section>
+      <footer class="reference-footer"><span>LensLogger mocking guide</span><a href="network.html">Network visualizer <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="datastore.html">DataStore visualizer <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="index.html">Setup &amp; API <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="examples.html#results">Visual examples <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="https://lucide.dev/">Icons by Lucide <i class="doc-icon trailing-icon" data-lucide="external-link" aria-hidden="true"></i></a></footer>
+    </main>
+  </div>
+  <script src="https://unpkg.com/lucide@1.77.0/dist/umd/lucide.min.js"></script>
+  <script src="icons.js"></script>
+  <script src="theme.js"></script>
+  <script src="reference.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+/* Shared documentation navigation across the guide, visualizers, and setup reference. */
+.topbar{position:sticky;top:0;z-index:20;background:#fffffff2;backdrop-filter:blur(14px)}
+.top-links a[aria-current="page"]{color:var(--purple)}
+.top-links a{display:inline-flex;align-items:center;gap:6px}
+.doc-icon{width:15px;height:15px;flex:0 0 auto;stroke-width:1.8;vertical-align:-3px}
+.button{gap:8px}
+.reference-footer a,.footer-inner>a:not(.brand){display:inline-flex;align-items:center;gap:5px}
+.inline-link,.feature-list li>a,.feature-grid h3>a,.code-result{display:inline-flex;align-items:center;gap:5px}
+.trailing-icon{width:13px;height:13px;vertical-align:middle;opacity:.82;flex:0 0 auto}
+.strip-arrow.doc-icon{width:26px;height:26px;justify-self:end}
+.outline details summary{display:flex;align-items:center;gap:7px}
+.outline details summary:after{margin-left:auto}
+.reference-page .outline{top:90px;max-height:calc(100vh - 110px)}
+.chapter-outline{display:flex;align-items:center;gap:22px;min-height:58px;color:#77707c;font-size:12px}
+.chapter-outline span{color:#9a91a2;font:500 10px var(--mono);letter-spacing:.12em}
+.chapter-outline a{padding:5px 0;border-bottom:1px solid transparent}
+.chapter-outline a:hover{border-color:var(--purple);color:var(--purple)}
+@media(max-width:640px){
+  .top-links{max-width:68vw;gap:12px;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+  .top-links::-webkit-scrollbar{display:none}
+  .top-links a:nth-child(2){display:inline}
+  .reference-page .outline{top:auto;max-height:none}
+  .chapter-outline{gap:16px;overflow-x:auto;white-space:nowrap}
+}

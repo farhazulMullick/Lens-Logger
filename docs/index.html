@@ -26,7 +26,7 @@
     <aside class="outline" aria-label="Documentation navigation and page outline">
       <p class="outline-label">LENSLOGGER DOCS</p>
       <details open><summary><i class="doc-icon" data-lucide="library" aria-hidden="true"></i>Library</summary><a href="#overview">Overview</a><a href="#features">Features</a><a href="#demo">Demo</a></details>
-      <details open><summary><i class="doc-icon" data-lucide="settings-2" aria-hidden="true"></i>Setup</summary><a href="#pages">GitHub Pages</a><a href="#installation">Installation</a><a href="#maven-local">Maven Local</a></details>
+      <details open><summary><i class="doc-icon" data-lucide="settings-2" aria-hidden="true"></i>Setup</summary><a href="#installation">Installation</a></details>
       <details open><summary><i class="doc-icon" data-lucide="plug-zap" aria-hidden="true"></i>Integrations</summary><a href="#ktor">Ktor Client</a><a href="#okhttp">OkHttp / Retrofit</a><a href="#compose">Compose root</a><a href="#android">Android without Compose</a></details>
       <details open><summary><i class="doc-icon" data-lucide="book-open-check" aria-hidden="true"></i>Guides</summary><a href="network.html">Network visualizer</a><a href="mocking.html">Mock response guide</a><a href="datastore.html">DataStore visualizer</a><a href="examples.html#results">Visual result examples</a></details>
       <details open><summary><i class="doc-icon" data-lucide="book-bookmark" aria-hidden="true"></i>Reference</summary><a href="#license">License</a></details>
@@ -55,11 +55,6 @@
         <a class="inline-link" href="network.html">Read the Network Visualizer guide <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><br><a class="inline-link" href="mocking.html">Read the Network Mocking guide <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><br><a class="inline-link" href="examples.html#workflow">Browse the visual walkthrough <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a>
       </section>
 
-      <section id="pages" class="reference-section"><p class="eyebrow">PUBLISH THE GUIDE</p><h2>GitHub Pages</h2>
-        <p>The static documentation site is stored in <code>docs/</code>. The repository's Pages workflow deploys it after documentation changes reach <code>main</code>.</p>
-        <p>In the repository settings, open <strong>Settings → Pages</strong> and set the build and deployment source to <strong>GitHub Actions</strong>. After the first successful workflow run, GitHub displays the published URL in the Pages settings panel.</p>
-      </section>
-
       <section id="installation" class="reference-section"><p class="eyebrow">GET STARTED</p><h2>Installation</h2>
         <p>Add the LensLogger artifact to your module's <code>commonMain</code> dependencies:</p>
         <pre><code>dependencies {
@@ -68,19 +63,6 @@
         <p>Or add it to your <code>libs.versions.toml</code>:</p>
         <pre><code>lensLoggerVersion = "&lt;version&gt;"
 lens-logger = { module = "io.github.farhazulmullick:lens-logger", version.ref = "lensLoggerVersion" }</code></pre>
-      </section>
-
-      <section id="maven-local" class="reference-section"><p class="eyebrow">LOCAL DEVELOPMENT</p><h2>Publish to Maven Local</h2>
-        <p>To try local library changes in another project, publish the artifacts from the repository root:</p>
-        <pre><code>./gradlew publishToMavenLocal</code></pre>
-        <p>Artifacts use group ID <code>io.github.farhazulmullick</code> and the current version <code>1.2.0-SNAPSHOT</code> (see each module's <code>build.gradle.kts</code> under <code>mavenPublishing { coordinates(...) }</code>). They are installed under <code>~/.m2/repository/io/github/farhazulmullick/</code>.</p>
-        <p>In the separate Android or KMP project, add Maven Local to repositories in the top-level <code>settings.gradle.kts</code> (for example, in <code>dependencyResolutionManagement.repositories</code>):</p>
-        <pre><code>mavenLocal()</code></pre>
-        <p>Then add the snapshot dependency to <code>app/build.gradle.kts</code> or your shared <code>commonMain</code> source set:</p>
-        <pre><code>dependencies {
-    implementation("io.github.farhazulmullick:lens-logger:1.2.0-SNAPSHOT")
-}</code></pre>
-        <div class="doc-note"><b>Compose requirement</b><p>Your app must already use Jetpack Compose (and compatible Kotlin / Compose Compiler versions) because <code>lens-ui</code> is Compose-based. After changing the library, run <code>publishToMavenLocal</code> again and sync or refresh dependencies in the consumer so Gradle picks up the new snapshot.</p></div>
       </section>
 
       <section id="usage" class="reference-section"><p class="eyebrow">INTEGRATION</p><h2>Usage</h2>

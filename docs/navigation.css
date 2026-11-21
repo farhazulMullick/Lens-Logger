@@ -3,6 +3,11 @@
 .top-links a[aria-current="page"]{color:var(--purple)}
 .top-links a{display:inline-flex;align-items:center;gap:6px}
 .doc-icon{width:15px;height:15px;flex:0 0 auto;stroke-width:1.8;vertical-align:-3px}
+.button{gap:8px}
+.reference-footer a,.footer-inner>a:not(.brand){display:inline-flex;align-items:center;gap:5px}
+.inline-link,.feature-list li>a,.feature-grid h3>a,.code-result{display:inline-flex;align-items:center;gap:5px}
+.trailing-icon{width:13px;height:13px;vertical-align:middle;opacity:.82;flex:0 0 auto}
+.strip-arrow.doc-icon{width:26px;height:26px;justify-self:end}
 .outline details summary{display:flex;align-items:center;gap:7px}
 .outline details summary:after{margin-left:auto}
 .reference-page .outline{top:90px;max-height:calc(100vh - 110px)}

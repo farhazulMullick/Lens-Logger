@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8f5fc">
   <meta name="description" content="Create LensLogger mock rules, define response data, simulate network failures, and replay requests in your app.">
+  <script src="theme-init.js"></script>
   <title>Mock Network Responses · LensLogger</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,11 +13,13 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="reference.css">
   <link rel="stylesheet" href="navigation.css">
+  <link rel="stylesheet" href="themes.css">
 </head>
 <body class="reference-page">
   <header class="topbar">
     <a class="brand" href="index.html" aria-label="LensLogger guide home"><span class="brand-mark">L</span><span>LensLogger<span class="brand-muted"> / Docs</span></span></a>
     <nav class="top-links" aria-label="Documentation navigation"><a href="index.html"><i class="doc-icon" data-lucide="book-open" aria-hidden="true"></i>Setup &amp; API</a><a href="network.html"><i class="doc-icon" data-lucide="activity" aria-hidden="true"></i>Network</a><a href="mocking.html" aria-current="page"><i class="doc-icon" data-lucide="shuffle" aria-hidden="true"></i>Mocking</a><a href="datastore.html"><i class="doc-icon" data-lucide="database" aria-hidden="true"></i>DataStore</a><a href="https://github.com/farhazulMullick/Lens-Logger"><i class="doc-icon" data-lucide="github" aria-hidden="true"></i>GitHub</a></nav>
+    <button class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode"><i class="doc-icon" data-lucide="moon" aria-hidden="true"></i><span>Dark</span></button>
   </header>
 
   <div class="reference-layout">
@@ -33,7 +36,7 @@
       <section id="overview" class="reference-hero">
         <p class="eyebrow">NETWORK MOCKING</p><h1>Control the response your app sees.</h1>
         <p>Create a mock rule from a captured call or add one from the Mocks tab. Match a request by its full URL and HTTP method, then return a custom status, headers, and body—or simulate a network failure.</p>
-        <div class="reference-actions"><a class="button button-primary" href="#start">Create a mock <span aria-hidden="true">↓</span></a><a class="button button-soft" href="examples.html#results">View result examples <span aria-hidden="true">↗</span></a></div>
+        <div class="reference-actions"><a class="button button-primary" href="#start">Create a mock <i class="doc-icon trailing-icon" data-lucide="arrow-down" aria-hidden="true"></i></a><a class="button button-soft" href="examples.html#results">View result examples <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a></div>
       </section>
 
       <section id="start" class="reference-section"><p class="eyebrow">STEP 01</p><h2>Start with a captured request</h2>
@@ -66,7 +69,7 @@
 
       <section id="matching" class="reference-section"><p class="eyebrow">HOW MATCHING WORKS</p><h2>Match the exact request</h2>
         <p>A rule applies when it is enabled, the complete request URL equals the rule URL, and the HTTP method matches without regard to case. If there are multiple enabled rules with the same URL and method, the first matching rule is selected; keep only the scenario you want enabled for a given match.</p>
-        <div class="match-code"><span class="code-label">RULE MATCH</span><code>enabled<br>+ exact full URL<br>+ same HTTP method</code><span class="code-result">→ synthetic result</span></div>
+        <div class="match-code"><span class="code-label">RULE MATCH</span><code>enabled<br>+ exact full URL<br>+ same HTTP method</code><span class="code-result"><i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i> synthetic result</span></div>
         <p>Rules are saved locally by LensLogger and are available again when the app is reopened.</p>
       </section>
 
@@ -74,11 +77,12 @@
         <ul class="feature-list troubleshooting-list"><li>Confirm the rule is enabled in the Mocks list.</li><li>Compare the rule URL to the full URL sent by the request, including scheme, host, path, and query string.</li><li>Check the HTTP method.</li><li>Make sure the request uses the Ktor or OkHttp client configured with LensLogger.</li><li>If you have duplicate enabled rules for the same URL and method, disable the rules for other scenarios.</li></ul>
         <p>For help finding and inspecting calls, see the <a class="inline-link" href="network.html">Network Visualizer guide</a>.</p>
       </section>
-      <footer class="reference-footer"><span>LensLogger mocking guide</span><a href="network.html">Network visualizer →</a><a href="datastore.html">DataStore visualizer →</a><a href="index.html">Setup &amp; API →</a><a href="examples.html#results">Visual examples →</a><a href="https://lucide.dev/">Icons by Lucide ↗</a></footer>
+      <footer class="reference-footer"><span>LensLogger mocking guide</span><a href="network.html">Network visualizer <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="datastore.html">DataStore visualizer <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="index.html">Setup &amp; API <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="examples.html#results">Visual examples <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="https://lucide.dev/">Icons by Lucide <i class="doc-icon trailing-icon" data-lucide="external-link" aria-hidden="true"></i></a></footer>
     </main>
   </div>
   <script src="https://unpkg.com/lucide@1.77.0/dist/umd/lucide.min.js"></script>
   <script src="icons.js"></script>
+  <script src="theme.js"></script>
   <script src="reference.js"></script>
 </body>
 </html>

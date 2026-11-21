@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8f5fc">
   <meta name="description" content="Learn how to capture, search, and inspect network traffic in the LensLogger Network visualizer.">
+  <script src="theme-init.js"></script>
   <title>Network Visualizer · LensLogger</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,11 +13,13 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="reference.css">
   <link rel="stylesheet" href="navigation.css">
+  <link rel="stylesheet" href="themes.css">
 </head>
 <body class="reference-page">
   <header class="topbar">
     <a class="brand" href="index.html" aria-label="LensLogger guide home"><span class="brand-mark">L</span><span>LensLogger<span class="brand-muted"> / Docs</span></span></a>
     <nav class="top-links" aria-label="Documentation navigation"><a href="index.html"><i class="doc-icon" data-lucide="book-open" aria-hidden="true"></i>Setup &amp; API</a><a href="network.html" aria-current="page"><i class="doc-icon" data-lucide="activity" aria-hidden="true"></i>Network</a><a href="mocking.html"><i class="doc-icon" data-lucide="shuffle" aria-hidden="true"></i>Mocking</a><a href="datastore.html"><i class="doc-icon" data-lucide="database" aria-hidden="true"></i>DataStore</a><a href="https://github.com/farhazulMullick/Lens-Logger"><i class="doc-icon" data-lucide="github" aria-hidden="true"></i>GitHub</a></nav>
+    <button class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode"><i class="doc-icon" data-lucide="moon" aria-hidden="true"></i><span>Dark</span></button>
   </header>
 
   <div class="reference-layout">
@@ -34,12 +37,12 @@
       <section id="overview" class="reference-hero">
         <p class="eyebrow">NETWORK VISUALIZER</p><h1>Follow every request.</h1>
         <p>LensLogger collects configured Ktor and OkHttp traffic in one in-app Network view. Search the request list, inspect the request and response, and continue directly into mocking or cURL testing.</p>
-        <div class="reference-actions"><a class="button button-primary" href="#capture">Open the workflow <span aria-hidden="true">↓</span></a><a class="button button-soft" href="index.html">Setup &amp; API docs <span aria-hidden="true">↗</span></a></div>
+        <div class="reference-actions"><a class="button button-primary" href="#capture">Open the workflow <i class="doc-icon trailing-icon" data-lucide="arrow-down" aria-hidden="true"></i></a><a class="button button-soft" href="index.html">Setup &amp; API docs <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a></div>
       </section>
 
       <section id="capture" class="reference-section"><p class="eyebrow">STEP 01</p><h2>Connect a network client</h2>
         <p>Install a LensLogger integration on the client your app uses, then make a request. LensLogger supports its Ktor logger and the OkHttp application interceptor. Follow the matching setup guide:</p>
-        <div class="feature-grid"><article><span>KTOR</span><h3><a href="index.html#ktor">Ktor Client setup →</a></h3><p>Install <code>LensHttpLogger</code> in the shared HTTP client configuration.</p></article><article><span>OKHTTP</span><h3><a href="index.html#okhttp">OkHttp / Retrofit setup →</a></h3><p>Add <code>LensOkHttpInterceptor</code> to the application interceptor chain.</p></article></div>
+        <div class="feature-grid"><article><span>KTOR</span><h3><a href="index.html#ktor">Ktor Client setup <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a></h3><p>Install <code>LensHttpLogger</code> in the shared HTTP client configuration.</p></article><article><span>OKHTTP</span><h3><a href="index.html#okhttp">OkHttp / Retrofit setup <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a></h3><p>Add <code>LensOkHttpInterceptor</code> to the application interceptor chain.</p></article></div>
         <p>When using the Compose inspector, open the Lens FAB and select the <strong>Network</strong> tab.</p>
       </section>
 
@@ -56,18 +59,19 @@
       </section>
 
       <section id="actions" class="reference-section"><p class="eyebrow">REQUEST ACTIONS</p><h2>Continue from a captured call</h2>
-        <div class="feature-grid"><article><span>MOCK</span><h3><a href="mocking.html#start">Mock this request →</a></h3><p>Use the captured request and response as a starting point for a mock rule, then edit the response or simulate failure.</p></article><article><span>CURL</span><h3>Copy cURL</h3><p>Copy the selected request as a cURL command to share or reproduce it outside the app.</p></article></div>
+        <div class="feature-grid"><article><span>MOCK</span><h3><a href="mocking.html#start">Mock this request <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a></h3><p>Use the captured request and response as a starting point for a mock rule, then edit the response or simulate failure.</p></article><article><span>CURL</span><h3>Copy cURL</h3><p>Copy the selected request as a cURL command to share or reproduce it outside the app.</p></article></div>
         <p>Mocked requests are marked with a <strong>MOCK</strong> badge in the Network view. The mocking guide explains how to configure and replay a rule.</p>
       </section>
 
       <section id="troubleshoot" class="reference-section"><p class="eyebrow">TROUBLESHOOTING</p><h2>If no calls appear</h2>
         <ul class="feature-list troubleshooting-list"><li>Install the Ktor or OkHttp integration on the same client that sends the request.</li><li>Make a request after the Lens inspector is available.</li><li>Check the Network tab search field and clear it if needed.</li><li>Confirm the selected app flow uses a supported configured client.</li></ul>
       </section>
-      <footer class="reference-footer"><span>LensLogger Network guide</span><a href="index.html">Setup &amp; API →</a><a href="mocking.html">Mock responses →</a><a href="datastore.html">DataStore →</a><a href="https://lucide.dev/">Icons by Lucide ↗</a></footer>
+      <footer class="reference-footer"><span>LensLogger Network guide</span><a href="index.html">Setup &amp; API <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="mocking.html">Mock responses <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="datastore.html">DataStore <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="https://lucide.dev/">Icons by Lucide <i class="doc-icon trailing-icon" data-lucide="external-link" aria-hidden="true"></i></a></footer>
     </main>
   </div>
   <script src="https://unpkg.com/lucide@1.77.0/dist/umd/lucide.min.js"></script>
   <script src="icons.js"></script>
+  <script src="theme.js"></script>
   <script src="reference.js"></script>
 </body>
 </html>

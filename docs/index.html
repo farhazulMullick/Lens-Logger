@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8f5fc">
   <meta name="description" content="Complete LensLogger documentation for installation, Ktor, OkHttp, Compose, Android, and network mocking.">
+  <script src="theme-init.js"></script>
   <title>Documentation · LensLogger</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,11 +13,13 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="reference.css">
   <link rel="stylesheet" href="navigation.css">
+  <link rel="stylesheet" href="themes.css">
 </head>
 <body class="reference-page">
   <header class="topbar">
     <a class="brand" href="index.html" aria-label="LensLogger guide home"><span class="brand-mark">L</span><span>LensLogger<span class="brand-muted"> / Docs</span></span></a>
     <nav class="top-links" aria-label="Documentation navigation"><a href="index.html" aria-current="page"><i class="doc-icon" data-lucide="book-open" aria-hidden="true"></i>Setup &amp; API</a><a href="network.html"><i class="doc-icon" data-lucide="activity" aria-hidden="true"></i>Network</a><a href="mocking.html"><i class="doc-icon" data-lucide="shuffle" aria-hidden="true"></i>Mocking</a><a href="datastore.html"><i class="doc-icon" data-lucide="database" aria-hidden="true"></i>DataStore</a><a href="https://github.com/farhazulMullick/Lens-Logger"><i class="doc-icon" data-lucide="github" aria-hidden="true"></i>GitHub</a></nav>
+    <button class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode"><i class="doc-icon" data-lucide="moon" aria-hidden="true"></i><span>Dark</span></button>
   </header>
 
   <div class="reference-layout">
@@ -35,11 +38,11 @@
         <p class="eyebrow">KOTLIN MULTIPLATFORM LIBRARY</p><h1>LensLogger</h1>
         <p>LensLogger is a Kotlin Multiplatform (KMP) library for Android, iOS, and Desktop that makes debugging network requests effortless. It automatically logs Ktor network requests and responses and provides a built-in UI to inspect these logs directly in your app.</p>
         <div class="doc-badges"><span>MIT License</span><span>Android</span><span>iOS</span><span>Desktop</span></div>
-        <div class="reference-actions"><a class="button button-primary" href="#installation">Install LensLogger <span aria-hidden="true">↓</span></a><a class="button button-soft" href="mocking.html">Explore mocking guide <span aria-hidden="true">↗</span></a></div>
+        <div class="reference-actions"><a class="button button-primary" href="#installation">Install LensLogger <i class="doc-icon trailing-icon" data-lucide="arrow-down" aria-hidden="true"></i></a><a class="button button-soft" href="mocking.html">Explore mocking guide <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a></div>
       </section>
 
       <section id="features" class="reference-section"><p class="eyebrow">CAPABILITIES</p><h2>Features</h2>
-        <ul class="feature-list"><li>Seamless integration with Ktor HTTP client</li><li>OkHttp application interceptor for Retrofit and raw <code>OkHttpClient</code> (Android and JVM Desktop)</li><li>Works on Android and iOS (KMP), with Desktop support</li><li>Logs network requests and responses</li><li>Built-in UI for real-time log inspection and mocking</li><li>Minimal setup and easy to use</li><li><a href="datastore.html">DataStore Visualizer guide →</a></li></ul>
+        <ul class="feature-list"><li>Seamless integration with Ktor HTTP client</li><li>OkHttp application interceptor for Retrofit and raw <code>OkHttpClient</code> (Android and JVM Desktop)</li><li>Works on Android and iOS (KMP), with Desktop support</li><li>Logs network requests and responses</li><li>Built-in UI for real-time log inspection and mocking</li><li>Minimal setup and easy to use</li><li><a href="datastore.html">DataStore Visualizer guide <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a></li></ul>
       </section>
 
       <section id="demo" class="reference-section"><p class="eyebrow">SEE IT IN ACTION</p><h2>Demo</h2>
@@ -49,7 +52,7 @@
           <figure class="demo-desktop"><img src="assets/desktop_logger_demo.gif" loading="lazy" alt="LensLogger running on Windows Desktop"><figcaption><b>Desktop</b><span>Windows network inspector</span></figcaption></figure>
           <figure><img src="assets/datastore_demo.gif" loading="lazy" alt="LensLogger DataStore visualizer"><figcaption><b>DataStore</b><span>Key and value inspection</span></figcaption></figure>
         </div>
-        <a class="inline-link" href="network.html">Read the Network Visualizer guide →</a><br><a class="inline-link" href="mocking.html">Read the Network Mocking guide →</a><br><a class="inline-link" href="examples.html#workflow">Browse the visual walkthrough →</a>
+        <a class="inline-link" href="network.html">Read the Network Visualizer guide <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><br><a class="inline-link" href="mocking.html">Read the Network Mocking guide <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><br><a class="inline-link" href="examples.html#workflow">Browse the visual walkthrough <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a>
       </section>
 
       <section id="pages" class="reference-section"><p class="eyebrow">PUBLISH THE GUIDE</p><h2>GitHub Pages</h2>
@@ -161,12 +164,13 @@ class MyApp : Application() {
         </article>
       </section>
 
-      <section id="license" class="reference-section"><p class="eyebrow">OPEN SOURCE</p><h2>License</h2><p>This project is licensed under the MIT License. <a class="inline-link" href="https://github.com/farhazulMullick/Lens-Logger/blob/main/LICENSE">Read the license ↗</a></p></section>
-      <footer class="reference-footer"><span>LensLogger documentation</span><a href="network.html">Network visualizer →</a><a href="mocking.html">Mock response guide →</a><a href="datastore.html">DataStore visualizer →</a><a href="https://lucide.dev/">Icons by Lucide ↗</a><a href="https://github.com/farhazulMullick/Lens-Logger">GitHub ↗</a></footer>
+      <section id="license" class="reference-section"><p class="eyebrow">OPEN SOURCE</p><h2>License</h2><p>This project is licensed under the MIT License. <a class="inline-link" href="https://github.com/farhazulMullick/Lens-Logger/blob/main/LICENSE">Read the license <i class="doc-icon trailing-icon" data-lucide="external-link" aria-hidden="true"></i></a></p></section>
+      <footer class="reference-footer"><span>LensLogger documentation</span><a href="network.html">Network visualizer <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="mocking.html">Mock response guide <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="datastore.html">DataStore visualizer <i class="doc-icon trailing-icon" data-lucide="arrow-right" aria-hidden="true"></i></a><a href="https://lucide.dev/">Icons by Lucide <i class="doc-icon trailing-icon" data-lucide="external-link" aria-hidden="true"></i></a><a href="https://github.com/farhazulMullick/Lens-Logger">GitHub <i class="doc-icon trailing-icon" data-lucide="external-link" aria-hidden="true"></i></a></footer>
     </main>
   </div>
   <script src="https://unpkg.com/lucide@1.77.0/dist/umd/lucide.min.js"></script>
   <script src="icons.js"></script>
+  <script src="theme.js"></script>
   <script src="reference.js"></script>
 </body>
 </html>

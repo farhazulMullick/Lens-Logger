@@ -12,7 +12,7 @@ mavenPublishing {
     coordinates(
         groupId = "io.github.farhazulmullick",
         artifactId = "lens-ui",
-        version = "1.2.0-SNAPSHOT",
+        version = providers.gradleProperty("LIBRARY_VERSION").get(),
     )
     pom {
         name.set("Lens UI")

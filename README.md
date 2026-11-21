@@ -20,11 +20,11 @@ This helps you quickly identify issues and monitor network activity during devel
 
 ## Documentation
 
-- [Setup & API](docs/index.html): installation, Ktor / OkHttp setup, Lens UI integration, and Android setup.
-- [Network Visualizer](docs/network.html): inspect captured requests and responses.
-- [Network Mocking](docs/mocking.html): configure and replay mock responses.
-- [DataStore Visualizer](docs/datastore.html): inspect Preferences DataStore.
-- [Mock result examples](docs/examples.html): screenshot walkthrough of successful and failed mock results.
+- [Setup & API](https://farhazulmullick.github.io/Lens-Logger/): installation, Ktor / OkHttp setup, Lens UI integration, and Android setup.
+- [Network Visualizer](https://farhazulmullick.github.io/Lens-Logger/network.html): inspect captured requests and responses.
+- [Network Mocking](https://farhazulmullick.github.io/Lens-Logger/mocking.html): configure and replay mock responses.
+- [DataStore Visualizer](https://farhazulmullick.github.io/Lens-Logger/datastore.html): inspect Preferences DataStore.
+- [Mock result examples](https://farhazulmullick.github.io/Lens-Logger/examples.html): screenshot walkthrough of successful and failed mock results.
 
 ## Demo
 
@@ -48,34 +48,6 @@ Or add to your `libs.versions.toml`:
 lensLoggerVersion = "<version>"
 lens-logger = { module = "io.github.farhazulmullick:lens-logger", version.ref = "lensLoggerVersion" }
 ```
-
-### Publish to Maven Local (try in another project)
-
-From this repository root:
-
-```bash
-./gradlew publishToMavenLocal
-```
-
-Artifacts use `groupId` **`io.github.farhazulmullick`**, current `version` **`1.2.0-SNAPSHOT`** (see each module’s `build.gradle.kts` under `mavenPublishing { coordinates(...) }`). They are installed under `~/.m2/repository/io/github/farhazulmullick/`.
-
-**In a separate Android (or KMP) project**, add Maven Local and the dependency.
-
-`settings.gradle.kts` (top-level `dependencyManagement` / `pluginManagement` repositories, or `dependencyResolutionManagement.repositories`):
-
-```kotlin
-mavenLocal()
-```
-
-`app/build.gradle.kts` (or your shared `commonMain` source set for KMP):
-
-```kotlin
-dependencies {
-    implementation("io.github.farhazulmullick:lens-logger:1.2.0-SNAPSHOT")
-}
-```
-
-Your app must already use **Jetpack Compose** (and compatible Kotlin / Compose Compiler versions) because `lens-ui` is Compose-based. After changing the library, run `publishToMavenLocal` again and **Sync** / **Refresh dependencies** in the consumer so Gradle picks up the new snapshot.
 
 ## Usage
 

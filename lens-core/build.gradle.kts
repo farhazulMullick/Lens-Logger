@@ -11,7 +11,7 @@ mavenPublishing {
     coordinates(
         groupId = "io.github.farhazulmullick",
         artifactId = "lens-core",
-        version = "1.2.0-SNAPSHOT",
+        version = providers.gradleProperty("LIBRARY_VERSION").get()
     )
     pom {
         name.set("Lens Core")
